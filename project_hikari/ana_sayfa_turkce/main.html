@@ -271,7 +271,7 @@
                 <h2 class="font-headline-lg text-headline-lg text-on-surface">Sizin İçin Önerilenler</h2>
                 <a class="font-label-md text-label-md text-primary hover:underline" href="#">Daha Fazla Gör</a>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+            <div id="recommended-products-grid" class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
                 <!-- Product Card 1 -->
                 <div onclick="window.location.href='detail.html'"
                     class="bg-surface-container-lowest rounded-DEFAULT overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer flex flex-col h-full">
@@ -443,7 +443,8 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-12 max-w-container-max mx-auto">
             <!-- Brand Column -->
             <div class="flex flex-col gap-4">
-                <a href="main.html" class="font-headline-md text-headline-md font-bold text-primary hover:opacity-80 transition-opacity">HIKARI</a>
+                <a href="main.html"
+                    class="font-headline-md text-headline-md font-bold text-primary hover:opacity-80 transition-opacity">HIKARI</a>
                 <p class="font-body-md text-body-md text-secondary dark:text-secondary-fixed max-w-xs">Modern yaşam
                     tarzı için birinci sınıf temeller seçiyoruz. Nicelikten ziyade nitelik.</p>
             </div>
@@ -502,6 +503,80 @@
             </div>
         </div>
     </footer>
+    <script src="product%20datas/products.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('recommended-products-grid');
+            if (grid) {
+                grid.innerHTML = ''; // Clear existing hardcoded cards immediately
+            }
+            try {
+                const products = productsData || [];
+
+                // Get 4 random products
+                const shuffled = products.sort(() => 0.5 - Math.random());
+                const selected = shuffled.slice(0, 4);
+
+                if (grid) {
+
+                    selected.forEach((product, index) => {
+                        const price = product.price ? parseFloat(product.price).toFixed(2) : '0.00';
+                        const rating = product.stars || 5;
+                        const reviews = Math.floor(Math.random() * 300) + 10;
+
+                        // Hide on mobile for 3rd and 4th items to match original design
+                        const hideClass = index >= 2 ? 'hidden md:flex' : '';
+                        
+                        let starsHTML = '';
+                        for(let i=1; i<=5; i++) {
+                            if (rating >= i) {
+                                starsHTML += `<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>`;
+                            } else if (rating >= i - 0.5) {
+                                starsHTML += `<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star_half</span>`;
+                            } else {
+                                starsHTML += `<span class="material-symbols-outlined text-surface-dim text-sm" style="font-variation-settings: 'FILL' 1;">star</span>`;
+                            }
+                        }
+
+                        const cardHTML = `
+                            <div onclick="window.location.href='detail.html?id=${encodeURIComponent(product.image)}&reviews=${reviews}'"
+                                class="bg-surface-container-lowest rounded-DEFAULT overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer flex flex-col h-full ${hideClass}">
+                                <div class="relative aspect-[4/5] bg-surface-container-low overflow-hidden">
+                                    <img alt="${product['display name']}"
+                                        class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                                        src="product datas/data/${product.image}" />
+                                    <button aria-label="Add to Favorites"
+                                        class="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full text-secondary hover:text-primary transition-colors shadow-sm"
+                                        onclick="event.stopPropagation();">
+                                        <span class="material-symbols-outlined text-xl">favorite</span>
+                                    </button>
+                                </div>
+                                <div class="p-4 flex flex-col flex-grow">
+                                    <span class="font-label-sm text-label-sm text-secondary mb-1 uppercase tracking-wider">${product.category}</span>
+                                    <h3 class="font-body-md text-body-md text-on-surface mb-2 line-clamp-2">${product['display name']}</h3>
+                                    <div class="flex items-center gap-1 mb-3">
+                                        ${starsHTML}
+                                        <span class="font-label-sm text-label-sm text-secondary ml-1">(${reviews})</span>
+                                    </div>
+                                    <div class="mt-auto flex justify-between items-center">
+                                        <span class="font-headline-md text-headline-md text-on-surface">$${price}</span>
+                                        <button aria-label="Add to cart"
+                                            class="p-2 bg-surface-container rounded-DEFAULT text-on-surface hover:bg-primary hover:text-white transition-colors"
+                                            onclick="event.stopPropagation();">
+                                            <span class="material-symbols-outlined text-xl">add_shopping_cart</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        grid.innerHTML += cardHTML;
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching products:", error);
+            }
+        });
+    </script>
 </body>
 
 </html>

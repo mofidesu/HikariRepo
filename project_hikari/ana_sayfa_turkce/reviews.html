@@ -540,6 +540,67 @@
     </div>
   </footer>
   <!-- END: Footer -->
+  <script src="product datas/products.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('id');
+      const reviews = urlParams.get('reviews') || 128;
+
+      if (productId && typeof productsData !== 'undefined') {
+        const product = productsData.find(p => p.image === productId);
+        if (product) {
+          const price = product.price ? parseFloat(product.price).toFixed(2) : '0.00';
+          const rating = product.stars || 5;
+
+          // Title & Image in Sidebar
+          const imageEl = document.querySelector('.w-20.h-24 img');
+          if (imageEl) {
+            imageEl.src = 'product datas/data/' + product.image;
+            imageEl.alt = product['display name'];
+          }
+
+          const titleEl = document.querySelector('h2.text-sm.font-medium.text-gray-900');
+          if (titleEl) titleEl.textContent = product['display name'];
+
+          // Price in Sidebar
+          const priceEl = document.querySelector('.mt-2.flex.items-baseline.gap-2 span.text-lg.font-bold');
+          if (priceEl) priceEl.textContent = '$' + price;
+          
+          const oldPriceEl = document.querySelector('.mt-2.flex.items-baseline.gap-2 span.line-through');
+          if (oldPriceEl) oldPriceEl.textContent = '$' + (parseFloat(price) * 1.25).toFixed(2);
+
+          // Reviews count in Sidebar
+          const reviewCountSmallEl = document.querySelector('.flex.items-center.gap-1.text-xs.text-gray-500.mt-1 > span:last-child');
+          if (reviewCountSmallEl) reviewCountSmallEl.textContent = reviews + ' Değerlendirme';
+
+          // Photo Reviews Filter Count
+          const photoReviewsFilterEl = document.querySelector('.bg-white.p-5.rounded-lg .flex.items-center.justify-between span.text-xs.text-gray-500');
+          if (photoReviewsFilterEl) {
+              const photoCount = Math.max(0, Math.floor(reviews * 0.25));
+              photoReviewsFilterEl.textContent = '(' + photoCount + ')';
+          }
+
+          // Breadcrumb text
+          const breadcrumbSpan = document.querySelectorAll('.flex.items-center.space-x-2.text-sm.text-gray-500.mb-6 span')[1];
+          if (breadcrumbSpan) breadcrumbSpan.textContent = product.category;
+
+          // Big Score & Reviews count in Main section
+          const bigScoreEl = document.querySelector('.flex.items-center.gap-3.mt-2 span.text-3xl');
+          if (bigScoreEl) bigScoreEl.textContent = rating;
+
+          const headerReviewTextEl = document.querySelector('.flex.items-center.gap-3.mt-2 span.text-sm.text-gray-500');
+          if (headerReviewTextEl) headerReviewTextEl.textContent = reviews + ' Değerlendirme';
+
+          // Back link
+          const backLink = document.querySelector('a[href^="detail.html"]');
+          if (backLink) {
+            backLink.href = 'detail.html?id=' + encodeURIComponent(product.image) + '&reviews=' + reviews;
+          }
+        }
+      }
+    });
+  </script>
 </body>
 
 </html>

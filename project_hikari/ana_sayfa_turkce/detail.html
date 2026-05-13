@@ -129,7 +129,8 @@
             </button>
             <!-- Brand Logo -->
             <div class="flex-1 flex justify-center">
-                <a class="font-headline-lg text-headline-lg font-bold text-primary tracking-tight" href="main.html">HIKARI</a>
+                <a class="font-headline-lg text-headline-lg font-bold text-primary tracking-tight"
+                    href="main.html">HIKARI</a>
             </div>
             <div class="flex-1 flex justify-end gap-4 items-center">
                 <button class="p-2 text-primary hover:opacity-80 transition-all active:scale-95 duration-200 md:hidden">
@@ -165,8 +166,6 @@
             <a class="hover:text-primary transition-colors" href="main.html">Anasayfa</a>
             <span class="material-symbols-outlined text-[14px]">chevron_right</span>
             <a class="hover:text-primary transition-colors" href="#">Güzellik</a>
-            <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-            <a class="hover:text-primary transition-colors" href="#">Cilt Bakımı</a>
             <span class="material-symbols-outlined text-[14px]">chevron_right</span>
             <span class="text-on-surface font-medium">Coconut Mix 250 ml</span>
         </nav>
@@ -409,7 +408,7 @@
     <footer class="bg-surface-container dark:bg-inverse-surface mt-24 border-t border-surface-variant">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-12 max-w-container-max mx-auto">
             <div class="col-span-1 md:col-span-1 mb-8 md:mb-0">
-                <div class="font-headline-md text-headline-md font-bold text-primary mb-4">LUXE</div>
+                <div class="font-headline-md text-headline-md font-bold text-primary mb-4">HIKARI</div>
                 <p class="font-body-md text-body-md text-secondary mb-6">Modern minimalistler için premium cilt bakımı.
                     Etik kaynaklı, bilimsel olarak kanıtlanmış.</p>
             </div>
@@ -458,6 +457,116 @@
             </p>
         </div>
     </footer>
+    <script src="product%20datas/products.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            const reviews = urlParams.get('reviews') || 128;
+
+            if (productId && typeof productsData !== 'undefined') {
+                const product = productsData.find(p => p.image === productId);
+                if (product) {
+                    const price = product.price ? parseFloat(product.price).toFixed(2) : '0.00';
+                    const rating = product.stars || 5;
+                    document.title = 'HIKARI | ' + product['display name'];
+
+                    // Update Breadcrumbs
+                    const breadcrumbs = document.querySelectorAll('nav[aria-label="Breadcrumb"] a');
+                    if (breadcrumbs.length > 1) {
+                        breadcrumbs[1].textContent = product.category;
+                    }
+                    const breadcrumbActive = document.querySelector('nav[aria-label="Breadcrumb"] span.text-on-surface');
+                    if (breadcrumbActive) breadcrumbActive.textContent = product['display name'];
+
+                    // Update main image and thumbnails
+                    const imgUrl = 'product datas/data/' + product.image;
+                    const mainImage = document.querySelector('.lg\\:col-span-7 .flex-1 img');
+                    if (mainImage) {
+                        mainImage.src = imgUrl;
+                        mainImage.alt = product['display name'];
+                    }
+
+                    const thumbnails = document.querySelectorAll('.lg\\:col-span-7 .flex.md\\:flex-col button img');
+                    thumbnails.forEach(img => {
+                        img.src = imgUrl;
+                        img.alt = product['display name'];
+                    });
+
+                    // Update product info
+                    const categoryEl = document.querySelector('.lg\\:col-span-5 h2');
+                    if (categoryEl) categoryEl.textContent = product.category;
+
+                    const titleEl = document.querySelector('.lg\\:col-span-5 h1');
+                    if (titleEl) titleEl.textContent = product['display name'];
+
+                    const reviewCountEl = document.querySelector('a[href^="reviews.html"]');
+                    if (reviewCountEl) {
+                        reviewCountEl.textContent = reviews + ' Değerlendirme';
+                        reviewCountEl.href = `reviews.html?id=${encodeURIComponent(product.image)}&reviews=${reviews}`;
+                    }
+
+                    let starsHTML = '';
+                    for (let i = 1; i <= 5; i++) {
+                        if (rating >= i) {
+                            starsHTML += `<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>`;
+                        } else if (rating >= i - 0.5) {
+                            starsHTML += `<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star_half</span>`;
+                        } else {
+                            starsHTML += `<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">star</span>`;
+                        }
+                    }
+                    const starsContainer = document.querySelector('.flex.items-center.text-primary-container');
+                    if (starsContainer) starsContainer.innerHTML = starsHTML;
+
+                    const priceEl = document.querySelector('.mb-8.flex.items-baseline.gap-4 span.font-headline-xl');
+                    if (priceEl && price) priceEl.textContent = '$' + price;
+
+                    const oldPriceEl = document.querySelector('.mb-8.flex.items-baseline.gap-4 span.line-through');
+                    if (oldPriceEl && price) oldPriceEl.textContent = '$' + (parseFloat(price) * 1.25).toFixed(2);
+
+                    const descEl = document.querySelector('.lg\\:col-span-5 > p.text-on-surface-variant');
+                    if (descEl) descEl.textContent = product.description;
+
+                    // Update Accordion Description
+                    const accordionDesc = document.querySelector('details.group:nth-child(1) div.mt-4');
+                    if (accordionDesc) accordionDesc.textContent = product.description;
+                }
+            }
+
+            // Load Similar Products
+            if (typeof productsData !== 'undefined') {
+                const similarGrid = document.querySelector('section.mt-24 .grid');
+                if (similarGrid) {
+                    similarGrid.innerHTML = ''; // Clear hardcoded similar products
+
+                    const shuffled = [...productsData].sort(() => 0.5 - Math.random());
+                    const filtered = shuffled.filter(p => p.image !== productId);
+                    const selected = filtered.slice(0, 4);
+
+                    selected.forEach((product, index) => {
+                        const simPrice = product.price ? parseFloat(product.price).toFixed(2) : '0.00';
+                        const reviews = Math.floor(Math.random() * 300) + 10;
+                        const hideClass = index === 3 ? 'hidden md:block' : '';
+
+                        const cardHTML = `
+                            <a class="group block ${hideClass}" href="detail.html?id=${encodeURIComponent(product.image)}&reviews=${reviews}">
+                                <div class="aspect-[4/5] bg-surface-container-lowest rounded-lg mb-4 overflow-hidden relative shadow-sm transition-all duration-300 group-hover:shadow-md">
+                                    <img alt="${product['display name']}"
+                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        src="product datas/data/${product.image}" />
+                                </div>
+                                <h4 class="font-label-md text-label-md text-secondary mb-1 uppercase tracking-wider">${product.category}</h4>
+                                <h5 class="font-body-md text-body-md text-on-surface mb-2 group-hover:text-primary transition-colors line-clamp-2">${product['display name']}</h5>
+                                <p class="font-label-md text-label-md text-on-surface">$${simPrice}</p>
+                            </a>
+                        `;
+                        similarGrid.innerHTML += cardHTML;
+                    });
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
