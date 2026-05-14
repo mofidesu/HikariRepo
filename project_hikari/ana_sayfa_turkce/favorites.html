@@ -182,7 +182,7 @@
             const favoriteProducts = products.filter(p => favoriteIds.includes(p.image));
 
             favoriteProducts.forEach(product => {
-                const price = product.price ? parseFloat(product.price).toFixed(2) : '0.00';
+                const price = formatPrice(product.price);
                 
                 const cardHTML = `
                     <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group flex flex-col h-full border border-surface-variant">
@@ -200,7 +200,7 @@
                             <span class="text-xs text-secondary mb-1 uppercase tracking-wider">${product.category}</span>
                             <h3 class="font-medium text-on-surface mb-2 line-clamp-2 cursor-pointer" onclick="window.location.href='detail.html?id=${encodeURIComponent(product.image)}&reviews=128'">${product['display name']}</h3>
                             <div class="mt-auto pt-4 flex justify-between items-center">
-                                <span class="text-lg font-bold text-on-surface">$${price}</span>
+                                <span class="text-lg font-bold text-on-surface">${price}</span>
                                 <button aria-label="Add to cart"
                                     class="p-2 bg-surface-container rounded-lg text-on-surface hover:bg-primary hover:text-white transition-colors"
                                     onclick="event.stopPropagation(); addToCart('${product.image}');">

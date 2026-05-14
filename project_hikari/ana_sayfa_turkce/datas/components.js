@@ -29,6 +29,36 @@ const Navbars = {
         </div>
     </header>
     `,
+    categories: `
+    <header class="bg-surface dark:bg-background shadow-sm dark:shadow-none docked full-width top-0 sticky z-50">
+        <div class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-container-max mx-auto">
+            <a class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-all active:scale-95 duration-200" href="main.html">HIKARI</a>
+            <div class="hidden md:flex flex-1 max-w-xl mx-8 relative">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary">search</span>
+                <input class="w-full pl-10 pr-4 py-3 rounded-DEFAULT border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/10 bg-surface-container-lowest text-on-surface font-body-md text-body-md outline-none transition-all" placeholder="Ürün, marka ve daha fazlasını arayın" type="text" />
+            </div>
+            <nav class="hidden md:flex items-center space-x-6">
+                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="main.html">Yeni Gelenler</a>
+                <a class="font-body-md text-body-md text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1" href="categories.html">Kategoriler</a>
+                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Koleksiyonlar</a>
+                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Erkek</a>
+                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Kadın</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+            </br>
+                <button aria-label="shopping_cart" onclick="window.location.href='cart.html'" class="text-secondary hover:text-primary transition-colors p-2 hover:bg-surface-container-high rounded-full relative">
+                    <span class="material-symbols-outlined">shopping_cart</span>
+                    <span id="cart-badge-categories" class="absolute top-0 right-0 bg-primary-container text-on-primary-container text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                </button>
+                <button aria-label="favorite" onclick="window.location.href='favorites.html'" class="text-secondary hover:text-primary transition-colors p-2 hover:bg-surface-container-high rounded-full relative">
+                    <span class="material-symbols-outlined">favorite</span>
+                    <span id="fav-badge-categories" class="absolute top-0 right-0 bg-primary-container text-on-primary-container text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                </button>
+                <div id="auth-container" class="flex items-center"></div>
+            </div>
+        </div>
+    </header>
+    `,
     detail: `
     <header class="bg-surface sticky top-0 z-50 shadow-sm w-full">
         <nav class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 w-full max-w-container-max mx-auto">
@@ -292,10 +322,10 @@ function updateCartAndFavoritesBadges() {
         const favCount = userData.favorites ? userData.favorites.length : 0;
 
         // Find all possible badges by ID prefix and update them
-        ['main', 'detail', 'reviews'].forEach(type => {
+        ['main', 'detail', 'reviews', 'categories'].forEach(type => {
             const cartBadge = document.getElementById(`cart-badge-${type}`);
             const favBadge = document.getElementById(`fav-badge-${type}`);
-            
+
             if (cartBadge) {
                 cartBadge.innerText = cartCount;
                 if (cartCount > 0) cartBadge.classList.remove('hidden');
@@ -311,7 +341,7 @@ function updateCartAndFavoritesBadges() {
 }
 
 // Global functions for adding to cart and favorites
-window.toggleFavorite = function(productId, iconElement) {
+window.toggleFavorite = function (productId, iconElement) {
     if (sessionStorage.getItem('isLoggedIn') !== 'true') {
         alert('Favorilere eklemek için lütfen giriş yapın.');
         window.location.href = 'login.html';
@@ -356,7 +386,7 @@ window.toggleFavorite = function(productId, iconElement) {
     updateCartAndFavoritesBadges();
 };
 
-window.addToCart = function(productId, quantity = 1) {
+window.addToCart = function (productId, quantity = 1) {
     if (sessionStorage.getItem('isLoggedIn') !== 'true') {
         alert('Sepete eklemek için lütfen giriş yapın.');
         window.location.href = 'login.html';
@@ -387,22 +417,22 @@ window.addToCart = function(productId, quantity = 1) {
 
     // Visual Update
     updateCartAndFavoritesBadges();
-    
+
     // Create a temporary toast notification
     const toast = document.createElement('div');
     toast.className = 'fixed bottom-4 right-4 bg-primary text-white px-4 py-2 rounded-lg shadow-lg font-body-md z-50 transform transition-all translate-y-0 opacity-100';
     toast.innerText = 'Ürün sepete eklendi!';
     document.body.appendChild(toast);
-    
+
     setTimeout(() => {
         toast.classList.add('translate-y-4', 'opacity-0');
         setTimeout(() => toast.remove(), 300);
     }, 2500);
 };
 
-window.removeFromCart = function(productId) {
+window.removeFromCart = function (productId) {
     if (sessionStorage.getItem('isLoggedIn') !== 'true') return;
-    
+
     const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
     if (!userData.cart) return;
 
@@ -420,9 +450,9 @@ window.removeFromCart = function(productId) {
     updateCartAndFavoritesBadges();
 };
 
-window.updateCartQuantity = function(productId, quantity) {
+window.updateCartQuantity = function (productId, quantity) {
     if (sessionStorage.getItem('isLoggedIn') !== 'true') return;
-    
+
     const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
     if (!userData.cart) return;
 
@@ -453,3 +483,9 @@ function renderFooter(type) {
         placeholder.innerHTML = Footers[type];
     }
 }
+
+window.formatPrice = function(price) {
+    const val = parseFloat(price) || 0;
+    return new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val) + ' TL';
+};
+
