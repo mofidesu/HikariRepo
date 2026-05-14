@@ -471,7 +471,7 @@
                     const price = product.price ? parseFloat(product.price).toFixed(2) : '0.00';
                     const rating = product.stars || 5;
                     document.title = 'HIKARI | ' + product['display name'];
-                    
+
                     let actualReviewCount = reviews; // fallback
                     if (typeof reviewsData !== 'undefined') {
                         const allProductReviews = reviewsData.filter(r => r.productId === product.image);

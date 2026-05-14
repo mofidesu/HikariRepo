@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>HIKARI | Sepetim</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#20005f",
+                        "primary-fixed-dim": "#ffb598",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#e3bfb1",
+                        "secondary-fixed": "#e4e2e1",
+                        "surface-container": "#eeeeee",
+                        "surface-dim": "#dadada",
+                        "on-primary-container": "#531a00",
+                        "surface-container-highest": "#e2e2e2",
+                        "tertiary": "#6648bf",
+                        "inverse-primary": "#ffb598",
+                        "surface-variant": "#e2e2e2",
+                        "on-background": "#1a1c1c",
+                        "error": "#ba1a1a",
+                        "outline": "#8f7065",
+                        "on-tertiary-fixed-variant": "#4d2da6",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#ffdbce",
+                        "inverse-on-surface": "#f1f1f1",
+                        "on-primary-fixed": "#370e00",
+                        "surface": "#f9f9f9",
+                        "surface-container-high": "#e8e8e8",
+                        "tertiary-fixed-dim": "#cdbdff",
+                        "on-surface": "#1a1c1c",
+                        "primary": "#a63c00",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#7e2c00",
+                        "on-secondary-container": "#656464",
+                        "secondary": "#5f5e5e",
+                        "secondary-container": "#e4e2e1",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#a63c00",
+                        "surface-container-low": "#f3f3f3",
+                        "inverse-surface": "#2f3131",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "background": "#f9f9f9",
+                        "primary-container": "#ff6000",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#9d80fa",
+                        "on-secondary-fixed-variant": "#474747",
+                        "on-tertiary-container": "#33008c",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#5b4137",
+                        "surface-bright": "#f9f9f9",
+                        "tertiary-fixed": "#e8deff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "base": "8px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f9;
+            color: #1a1c1c;
+        }
+
+        /* Hide arrows on number input */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <div id="navbar-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="flex-grow w-full max-w-container-max mx-auto px-4 md:px-8 py-8">
+        <h1 class="text-3xl font-bold text-on-surface mb-8">Sepetim</h1>
+
+        <div id="cart-empty" class="hidden flex-col items-center justify-center py-20 bg-surface-container-lowest rounded-xl border border-surface-variant">
+            <span class="material-symbols-outlined text-6xl text-outline-variant mb-4" style="font-variation-settings: 'FILL' 0;">shopping_cart</span>
+            <h2 class="text-xl font-bold text-on-surface mb-2">Sepetiniz şu an boş</h2>
+            <p class="text-secondary mb-6 text-center max-w-md">Binlerce ürün arasından size en uygun olanı bulmak için alışverişe başlayın.</p>
+            <a href="main.html" class="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity">Alışverişe Başla</a>
+        </div>
+
+        <div id="cart-content" class="flex flex-col lg:flex-row gap-8 hidden">
+            <!-- Left Column: Cart Items -->
+            <div class="flex-grow">
+                <div class="bg-surface-container-lowest rounded-xl border border-surface-variant overflow-hidden">
+                    <div class="p-6 border-b border-surface-variant flex justify-between items-center bg-surface-container-low">
+                        <h2 class="font-bold text-lg">Ürünler (<span id="cart-item-count">0</span>)</h2>
+                    </div>
+                    <div id="cart-items-container" class="divide-y divide-surface-variant">
+                        <!-- Cart Items Injected Here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Order Summary -->
+            <div class="w-full lg:w-80 flex-shrink-0">
+                <div class="bg-surface-container-lowest rounded-xl border border-surface-variant p-6 sticky top-24">
+                    <h2 class="font-bold text-lg mb-6">Sipariş Özeti</h2>
+                    
+                    <div class="flex justify-between items-center mb-4 text-on-surface-variant">
+                        <span>Ara Toplam</span>
+                        <span id="summary-subtotal" class="font-medium text-on-surface">$0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-4 text-on-surface-variant">
+                        <span>Kargo Tutarı</span>
+                        <span id="summary-shipping" class="font-medium text-on-surface">$10.00</span>
+                    </div>
+                    
+                    <hr class="border-surface-variant my-4" />
+                    
+                    <div class="flex justify-between items-center mb-8">
+                        <span class="font-bold text-lg">Genel Toplam</span>
+                        <span id="summary-total" class="font-bold text-2xl text-primary">$0.00</span>
+                    </div>
+
+                    <button class="w-full bg-primary text-white font-medium py-4 rounded-lg hover:bg-opacity-90 transition-all flex items-center justify-center gap-2">
+                        Sepeti Onayla
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                    
+                    <div class="mt-4 flex items-center justify-center gap-2 text-sm text-secondary">
+                        <span class="material-symbols-outlined text-base">lock</span>
+                        Güvenli Alışveriş
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="datas/products.js"></script>
+    <script src="datas/components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNavbar('main');
+            renderFooter('main');
+
+            if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            renderCart();
+        });
+
+        // Wrapper to re-render after removal
+        const originalRemoveFromCart = window.removeFromCart;
+        window.removeFromCart = function(productId) {
+            originalRemoveFromCart(productId);
+            renderCart();
+        };
+
+        const originalUpdateCartQuantity = window.updateCartQuantity;
+        window.updateCartQuantity = function(productId, quantity) {
+            originalUpdateCartQuantity(productId, quantity);
+            renderCart();
+        };
+
+        function renderCart() {
+            const contentDiv = document.getElementById('cart-content');
+            const emptyDiv = document.getElementById('cart-empty');
+            const itemsContainer = document.getElementById('cart-items-container');
+            
+            const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
+            const cartItems = userData.cart || [];
+
+            if (cartItems.length === 0) {
+                contentDiv.classList.add('hidden');
+                emptyDiv.classList.remove('hidden');
+                emptyDiv.classList.add('flex');
+                return;
+            }
+
+            contentDiv.classList.remove('hidden');
+            emptyDiv.classList.add('hidden');
+            emptyDiv.classList.remove('flex');
+            
+            itemsContainer.innerHTML = '';
+            const products = (typeof productsData !== 'undefined') ? productsData : [];
+            
+            let subtotal = 0;
+            let totalItems = 0;
+
+            cartItems.forEach(cartItem => {
+                const product = products.find(p => p.image === cartItem.productId);
+                if (!product) return;
+
+                const price = parseFloat(product.price || 0);
+                const quantity = cartItem.quantity;
+                const itemTotal = price * quantity;
+                
+                subtotal += itemTotal;
+                totalItems += quantity;
+
+                const itemHTML = `
+                    <div class="p-6 flex flex-col sm:flex-row gap-6">
+                        <!-- Image -->
+                        <div class="w-24 h-32 flex-shrink-0 bg-surface-container-low rounded-lg overflow-hidden cursor-pointer" onclick="window.location.href='detail.html?id=${encodeURIComponent(product.image)}&reviews=128'">
+                            <img src="datas/data/${product.image}" alt="${product['display name']}" class="w-full h-full object-cover">
+                        </div>
+                        
+                        <!-- Details -->
+                        <div class="flex-grow flex flex-col justify-between">
+                            <div class="flex justify-between items-start gap-4">
+                                <div>
+                                    <span class="text-xs text-secondary mb-1 uppercase tracking-wider">${product.category}</span>
+                                    <h3 class="font-medium text-lg text-on-surface mb-1 cursor-pointer hover:text-primary transition-colors" onclick="window.location.href='detail.html?id=${encodeURIComponent(product.image)}&reviews=128'">${product['display name']}</h3>
+                                    <p class="text-primary font-bold">$${price.toFixed(2)}</p>
+                                </div>
+                                <button onclick="removeFromCart('${product.image}')" class="text-secondary hover:text-error transition-colors p-2 bg-surface-container hover:bg-error-container/20 rounded-lg">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Quantity & Total -->
+                            <div class="flex justify-between items-end mt-4">
+                                <div class="flex items-center border border-outline-variant rounded-lg h-10 overflow-hidden bg-surface-container-lowest">
+                                    <button onclick="updateCartQuantity('${product.image}', ${quantity - 1})" class="px-3 h-full text-secondary hover:text-primary hover:bg-surface-container transition-colors flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-[18px]">remove</span>
+                                    </button>
+                                    <input type="number" min="1" value="${quantity}" readonly class="w-12 text-center font-medium text-on-surface border-none focus:ring-0 p-0 h-full bg-transparent">
+                                    <button onclick="updateCartQuantity('${product.image}', ${quantity + 1})" class="px-3 h-full text-secondary hover:text-primary hover:bg-surface-container transition-colors flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-[18px]">add</span>
+                                    </button>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-sm text-secondary block mb-1">Ara Toplam</span>
+                                    <span class="font-bold text-on-surface">$${itemTotal.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                itemsContainer.innerHTML += itemHTML;
+            });
+
+            // Update Summary
+            const shipping = subtotal > 100 ? 0 : 10; // Free shipping over $100
+            const total = subtotal + shipping;
+
+            document.getElementById('cart-item-count').innerText = totalItems;
+            document.getElementById('summary-subtotal').innerText = '$' + subtotal.toFixed(2);
+            
+            const shippingEl = document.getElementById('summary-shipping');
+            if (shipping === 0) {
+                shippingEl.innerText = 'Ücretsiz';
+                shippingEl.classList.add('text-green-600');
+            } else {
+                shippingEl.innerText = '$' + shipping.toFixed(2);
+                shippingEl.classList.remove('text-green-600');
+            }
+
+            document.getElementById('summary-total').innerText = '$' + total.toFixed(2);
+        }
+    </script>
+</body>
+</html>
