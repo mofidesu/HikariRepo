@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>HIKARI | Favorilerim</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#a63c00",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#ffdbce",
+                        "on-primary-container": "#370e00",
+                        "secondary": "#77574e",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#ffdbce",
+                        "on-secondary-container": "#2c150f",
+                        "surface": "#fff8f6",
+                        "on-surface": "#231917",
+                        "surface-variant": "#f5dcd4",
+                        "on-surface-variant": "#53433f",
+                        "outline": "#85736e",
+                        "outline-variant": "#d8c2bc",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#fef1ec",
+                        "surface-container": "#f8ebe7",
+                        "surface-container-high": "#f2e5e1",
+                        "surface-container-highest": "#ece0db",
+                        "brand": "#a63c00"
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: var(--color-surface); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <div id="navbar-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="flex-grow w-full max-w-container-max mx-auto px-4 md:px-8 py-8">
+        <h1 class="text-3xl font-bold text-on-surface mb-2">Favorilerim</h1>
+        <p class="text-secondary mb-8">Kalbinizi çalan tüm ürünler burada.</p>
+
+        <div id="favorites-empty" class="hidden flex-col items-center justify-center py-20 bg-surface-container-lowest rounded-xl border border-surface-variant">
+            <span class="material-symbols-outlined text-6xl text-outline-variant mb-4" style="font-variation-settings: 'FILL' 1;">favorite</span>
+            <h2 class="text-xl font-bold text-on-surface mb-2">Henüz favori ürününüz yok</h2>
+            <p class="text-secondary mb-6 text-center max-w-md">Beğendiğiniz ürünleri favorilere ekleyerek daha sonra kolayca bulabilirsiniz.</p>
+            <a href="main.html" class="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity">Alışverişe Başla</a>
+        </div>
+
+        <div id="favorites-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <!-- Favorite cards will be injected here -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="datas/products.js"></script>
+    <script src="datas/components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNavbar('main');
+            renderFooter('main');
+
+            if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            renderFavorites();
+        });
+
+        // Add a global wrapper for toggleFavorite in this page so it refreshes the grid
+        const originalToggleFavorite = window.toggleFavorite;
+        window.toggleFavorite = function(productId, iconElement) {
+            originalToggleFavorite(productId, iconElement);
+            renderFavorites(); // re-render to remove the card
+        };
+
+        function renderFavorites() {
+            const grid = document.getElementById('favorites-grid');
+            const emptyState = document.getElementById('favorites-empty');
+            
+            const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
+            const favoriteIds = userData.favorites || [];
+
+            if (favoriteIds.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+            
+            grid.innerHTML = '';
+            const products = (typeof productsData !== 'undefined') ? productsData : [];
+            
+            // Filter products that are in favorites
+            const favoriteProducts = products.filter(p => favoriteIds.includes(p.image));
+
+            favoriteProducts.forEach(product => {
+                const price = product.price ? parseFloat(product.price).toFixed(2) : '0.00';
+                
+                const cardHTML = `
+                    <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group flex flex-col h-full border border-surface-variant">
+                        <div class="relative aspect-[4/5] bg-surface-container-low overflow-hidden cursor-pointer" onclick="window.location.href='detail.html?id=${encodeURIComponent(product.image)}&reviews=128'">
+                            <img alt="${product['display name']}"
+                                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                                src="datas/data/${product.image}" />
+                            <button aria-label="Remove from Favorites"
+                                class="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full text-primary hover:text-error transition-colors shadow-sm"
+                                onclick="event.stopPropagation(); toggleFavorite('${product.image}', this.querySelector('span'));">
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                            </button>
+                        </div>
+                        <div class="p-4 flex flex-col flex-grow">
+                            <span class="text-xs text-secondary mb-1 uppercase tracking-wider">${product.category}</span>
+                            <h3 class="font-medium text-on-surface mb-2 line-clamp-2 cursor-pointer" onclick="window.location.href='detail.html?id=${encodeURIComponent(product.image)}&reviews=128'">${product['display name']}</h3>
+                            <div class="mt-auto pt-4 flex justify-between items-center">
+                                <span class="text-lg font-bold text-on-surface">$${price}</span>
+                                <button aria-label="Add to cart"
+                                    class="p-2 bg-surface-container rounded-lg text-on-surface hover:bg-primary hover:text-white transition-colors"
+                                    onclick="event.stopPropagation(); addToCart('${product.image}');">
+                                    <span class="material-symbols-outlined text-xl">add_shopping_cart</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += cardHTML;
+            });
+        }
+    </script>
+</body>
+</html>
