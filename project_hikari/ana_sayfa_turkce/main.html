@@ -503,7 +503,8 @@
             </div>
         </div>
     </footer>
-    <script src="product%20datas/products.js"></script>
+    <script src="datas/products.js"></script>
+    <script src="datas/reviews.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const grid = document.getElementById('recommended-products-grid');
@@ -522,7 +523,12 @@
                     selected.forEach((product, index) => {
                         const price = product.price ? parseFloat(product.price).toFixed(2) : '0.00';
                         const rating = product.stars || 5;
-                        const reviews = Math.floor(Math.random() * 300) + 10;
+                        
+                        let reviews = 128; // fallback
+                        if (typeof reviewsData !== 'undefined') {
+                            const allProductReviews = reviewsData.filter(r => r.productId === product.image);
+                            reviews = allProductReviews.length;
+                        }
 
                         // Hide on mobile for 3rd and 4th items to match original design
                         const hideClass = index >= 2 ? 'hidden md:flex' : '';
@@ -544,7 +550,7 @@
                                 <div class="relative aspect-[4/5] bg-surface-container-low overflow-hidden">
                                     <img alt="${product['display name']}"
                                         class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                                        src="product datas/data/${product.image}" />
+                                        src="datas/data/${product.image}" />
                                     <button aria-label="Add to Favorites"
                                         class="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full text-secondary hover:text-primary transition-colors shadow-sm"
                                         onclick="event.stopPropagation();">
