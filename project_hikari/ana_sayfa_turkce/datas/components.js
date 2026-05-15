@@ -1,3 +1,51 @@
+const CollectionsData = {
+    'autumn': {
+        title: 'Sonbahar Essentials',
+        subtitle: 'HIKARI Selection',
+        description: 'Şehrin ritmine ayak uyduran, konfor ve zarafeti birleştiren Sonbahar seçkimizle tanışın. Yün dokular, toprak tonları ve zamansız silüetler.',
+        heroImage: 'datas/images/autumn_collection_hero_1778858262223.png',
+        seller: 'HIKARI Selection',
+        sellerLogo: 'HS',
+        products: ['22245.jpg', '22867.jpg', '15685.jpg', '46935.jpg', '31732.jpg'] // Casual shoes, chinos, perfume, blazer
+    },
+    'mothersday': {
+        title: 'Anneler Günü Özel',
+        subtitle: 'Lotus Home & HIKARI',
+        description: 'En değerli varlıklarımız için özenle seçilmiş hediyeler. Zarafet dolu detaylar, şık aksesuarlar ve sevginizi yansıtacak parçalar.',
+        heroImage: 'datas/images/mothers_day_collection_hero_1778858278156.png',
+        seller: 'Lotus Home',
+        sellerLogo: 'LH',
+        products: ['54018.jpg', '8141.jpg', '48603.jpg', '28951.jpg', '33126.jpg'] // Handbags, watches, earrings, kurtis, heels
+    },
+    'urban': {
+        title: 'Modern Şehir Esintisi',
+        subtitle: 'Urban Boutique Seçkisi',
+        description: 'Modern kadının şehirli stili. Keskin hatlar, güçlü duruşlar ve sofistike kombinler için hazırlanan özel bir koleksiyon.',
+        heroImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBzy3NWVFDFzVFj4bPDocM009pnOGgbHVNBU3GwyKLrvezXDh9p7mC6QG-h5k6hLJgJx470qH2UkYY4eNrGyGUK8YC37kiWtNbjYp8P4PYuJkIVDSHYd5b_qI8e6ump7bvZ93DmXagnF15_1zmnwXwl0RJbhkKpGGCD6yMXjW8nTXJh4D2qY0D1jde0qCxdC6AaiW-fnj7ZtmFUuhBTo6M7BS7Uop0VnCVkpMN-DOb0sojoE28zFVOqzNdWEKTggvCjvjvotI-E3TA',
+        seller: 'Urban Boutique',
+        sellerLogo: 'UB',
+        products: ['50945.jpg', '26372.jpg', '55025.jpg', '11305.jpg', '42659.jpg'] // Jeans, trousers, lipstick, etc.
+    },
+    'autumnspirit': {
+        title: 'Sonbahar Ruhu',
+        subtitle: 'Autumn Spirit x HIKARI',
+        description: 'Sıcak ve samimi dokularla Sonbaharın tadını çıkarın. Örgü detaylar, yumuşak kumaşlar ve ruhunuzu ısıtacak bir seçki.',
+        heroImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAkOQbmLa0AF_mhAK8NADejH3amLYpZJvU1NwkL_n8lwTV9qXp7GHz-BQxw0QjRgpHgl32HD6_Ty0wZb7XxN-RGKThqO6sPDiIzwRD5rrE4knJAstKzLSOubBLfXoFITJyIPSDMyALro7ijm1Amz3UgFAZ0iDL1WQafPmkbUMF8Z6pgfsPKBt7rF6utNU-_hZQalUyqzGnkd_tN4sNKQcOLMrBGfhcGWGDjZ1B0YBawUwqnSZSX8qunDoknBCpMfM5A9Ph7gZfw1Rg',
+        seller: 'Autumn Spirit',
+        sellerLogo: 'AS',
+        products: ['14997.jpg', '1584.jpg', '24523.jpg', '43014.jpg', '7215.jpg']
+    },
+    'accessories': {
+        title: 'Premium Aksesuarlar',
+        subtitle: 'HIKARI Luxury Details',
+        description: 'Stilinizi tamamlayan en zarif detaylar. Deri el işçiliği çantalar, özel tasarım saatler ve zarafeti simgeleyen aksesuarlar.',
+        heroImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBzy3NWVFDFzVFj4bPDocM009pnOGgbHVNBU3GwyKLrvezXDh9p7mC6QG-h5k6hLJgJx470qH2UkYY4eNrGyGUK8YC37kiWtNbjYp8P4PYuJkIVDSHYd5b_qI8e6ump7bvZ93DmXagnF15_1zmnwXwl0RJbhkKpGGCD6yMXjW8nTXJh4D2qY0D1jde0qCxdC6AaiW-fnj7ZtmFUuhBTo6M7BS7Uop0VnCVkpMN-DOb0sojoE28zFVOqzNdWEKTggvCjvjvotI-E3TA',
+        seller: 'HIKARI Boutique',
+        sellerLogo: 'HB',
+        products: ['54018.jpg', '8141.jpg', '15685.jpg', '22245.jpg', '48603.jpg']
+    }
+};
+
 const Navbars = {
     main: `
     <header class="bg-surface dark:bg-background shadow-sm dark:shadow-none docked full-width top-0 sticky z-50">
@@ -7,12 +55,89 @@ const Navbars = {
                 <span class="material-symbols-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary">search</span>
                 <input class="w-full pl-10 pr-4 py-3 rounded-DEFAULT border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/10 bg-surface-container-lowest text-on-surface font-body-md text-body-md outline-none transition-all" placeholder="Ürün, marka ve daha fazlasını arayın" type="text" />
             </div>
-            <nav class="hidden md:flex items-center space-x-6">
-                <a class="font-body-md text-body-md text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1" href="#">Yeni Gelenler</a>
-                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="categories.html">Kategoriler</a>
-                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Koleksiyonlar</a>
-                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Erkek</a>
-                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Kadın</a>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a class="font-body-md text-body-md text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1" href="main.html">Yeni Gelenler</a>
+                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors" href="categories.html">Kategoriler</a>
+                
+                <!-- Koleksiyonlar Dropdown -->
+                <div class="relative group py-4">
+                    <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors flex items-center gap-1" href="#">
+                        Koleksiyonlar
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                    </a>
+                    <div class="absolute left-1/2 -translate-x-1/2 top-full hidden group-hover:block w-[600px] bg-white dark:bg-background shadow-xl rounded-xl border border-outline-variant/30 p-6 z-50">
+                        <div class="grid grid-cols-3 gap-6">
+                            <div class="space-y-4">
+                                <h4 class="font-bold text-primary text-sm uppercase tracking-wider border-b border-primary/10 pb-2">Öne Çıkanlar</h4>
+                                <ul class="space-y-3">
+                                    <li><a href="collection.html?id=mothersday" class="text-on-surface hover:text-primary transition-colors flex flex-col">
+                                        <span class="font-medium">Anneler Günü</span>
+                                        <span class="text-xs text-secondary italic">HIKARI & ÇiçekSepeti Özel</span>
+                                    </a></li>
+                                    <li><a href="collection.html?id=autumn" class="text-on-surface hover:text-primary transition-colors flex flex-col">
+                                        <span class="font-medium">Sonbahar Essentials</span>
+                                        <span class="text-xs text-secondary italic">Urban Boutique Seçkisi</span>
+                                    </a></li>
+                                    <li><a href="collection.html?id=urban" class="text-on-surface hover:text-primary transition-colors flex flex-col">
+                                        <span class="font-medium">Yaz Esintisi</span>
+                                        <span class="text-xs text-secondary italic">Beach Mode x HIKARI</span>
+                                    </a></li>
+                                </ul>
+                            </div>
+                            <div class="col-span-2 bg-surface-container-low rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-xs font-bold text-secondary uppercase">Haftanın Seçkisi: Anneler Günü</span>
+                                    <span class="bg-primary text-white text-[10px] px-2 py-0.5 rounded-full font-bold">YENİ</span>
+                                </div>
+                                <div class="flex gap-3 h-32">
+                                    <div class="flex-1 rounded overflow-hidden shadow-sm border border-white">
+                                        <img src="datas/data/54018.jpg" class="w-full h-full object-cover" />
+                                    </div>
+                                    <div class="flex-1 rounded overflow-hidden shadow-sm border border-white">
+                                        <img src="datas/data/8141.jpg" class="w-full h-full object-cover" />
+                                    </div>
+                                    <div class="flex-1 bg-white rounded shadow-sm border border-white p-2 flex flex-col items-center justify-center text-center">
+                                        <p class="text-[10px] text-primary font-bold italic mb-1">Lotus Home</p>
+                                        <p class="text-[9px] text-secondary leading-tight mb-2">Porselen Fincan Takımı</p>
+                                        <a href="collection.html?id=mothersday" class="text-[10px] font-bold border-b border-primary text-primary">İncele</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Erkek Dropdown -->
+                <div class="relative group py-4">
+                    <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors flex items-center gap-1" href="#">
+                        Erkek
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                    </a>
+                    <div class="absolute left-0 top-full hidden group-hover:block w-48 bg-white dark:bg-background shadow-xl rounded-xl border border-outline-variant/30 py-3 z-50">
+                        <a href="collection.html?category=Trousers" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Pantolon</a>
+                        <a href="collection.html?category=Nightwear" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Pijama</a>
+                        <a href="collection.html?category=Tshirts" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">T-Shirt</a>
+                        <a href="collection.html?category=Shirts" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Gömlek</a>
+                        <a href="collection.html?category=Briefs" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">İç Çamaşır</a>
+                        <a href="collection.html?category=Accessories" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Aksesuar</a>
+                    </div>
+                </div>
+
+                <!-- Kadın Dropdown -->
+                <div class="relative group py-4">
+                    <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors flex items-center gap-1" href="#">
+                        Kadın
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                    </a>
+                    <div class="absolute left-0 top-full hidden group-hover:block w-48 bg-white dark:bg-background shadow-xl rounded-xl border border-outline-variant/30 py-3 z-50">
+                        <a href="collection.html?category=Trousers" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Pantolon</a>
+                        <a href="collection.html?category=Nightwear" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Pijama</a>
+                        <a href="collection.html?category=Tshirts" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">T-Shirt</a>
+                        <a href="collection.html?category=Shirts" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Gömlek</a>
+                        <a href="collection.html?category=Briefs" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">İç Çamaşır</a>
+                        <a href="collection.html?category=Accessories" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Aksesuar</a>
+                    </div>
+                </div>
             </nav>
             <div class="flex items-center space-x-4">
             </br>
@@ -37,12 +162,89 @@ const Navbars = {
                 <span class="material-symbols-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary">search</span>
                 <input class="w-full pl-10 pr-4 py-3 rounded-DEFAULT border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/10 bg-surface-container-lowest text-on-surface font-body-md text-body-md outline-none transition-all" placeholder="Ürün, marka ve daha fazlasını arayın" type="text" />
             </div>
-            <nav class="hidden md:flex items-center space-x-6">
-                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="main.html">Yeni Gelenler</a>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors" href="main.html">Yeni Gelenler</a>
                 <a class="font-body-md text-body-md text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1" href="categories.html">Kategoriler</a>
-                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Koleksiyonlar</a>
-                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Erkek</a>
-                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors hover:opacity-80 transition-all active:scale-95 duration-200" href="#">Kadın</a>
+                
+                <!-- Koleksiyonlar Dropdown -->
+                <div class="relative group py-4">
+                    <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors flex items-center gap-1" href="#">
+                        Koleksiyonlar
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                    </a>
+                    <div class="absolute left-1/2 -translate-x-1/2 top-full hidden group-hover:block w-[600px] bg-white dark:bg-background shadow-xl rounded-xl border border-outline-variant/30 p-6 z-50">
+                        <div class="grid grid-cols-3 gap-6">
+                            <div class="space-y-4">
+                                <h4 class="font-bold text-primary text-sm uppercase tracking-wider border-b border-primary/10 pb-2">Öne Çıkanlar</h4>
+                                <ul class="space-y-3">
+                                    <li><a href="collection.html?id=mothersday" class="text-on-surface hover:text-primary transition-colors flex flex-col">
+                                        <span class="font-medium">Anneler Günü</span>
+                                        <span class="text-xs text-secondary italic">HIKARI & ÇiçekSepeti Özel</span>
+                                    </a></li>
+                                    <li><a href="collection.html?id=autumn" class="text-on-surface hover:text-primary transition-colors flex flex-col">
+                                        <span class="font-medium">Sonbahar Essentials</span>
+                                        <span class="text-xs text-secondary italic">Urban Boutique Seçkisi</span>
+                                    </a></li>
+                                    <li><a href="collection.html?id=urban" class="text-on-surface hover:text-primary transition-colors flex flex-col">
+                                        <span class="font-medium">Yaz Esintisi</span>
+                                        <span class="text-xs text-secondary italic">Beach Mode x HIKARI</span>
+                                    </a></li>
+                                </ul>
+                            </div>
+                            <div class="col-span-2 bg-surface-container-low rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-xs font-bold text-secondary uppercase">Haftanın Seçkisi: Anneler Günü</span>
+                                    <span class="bg-primary text-white text-[10px] px-2 py-0.5 rounded-full font-bold">YENİ</span>
+                                </div>
+                                <div class="flex gap-3 h-32">
+                                    <div class="flex-1 rounded overflow-hidden shadow-sm border border-white">
+                                        <img src="datas/data/54018.jpg" class="w-full h-full object-cover" />
+                                    </div>
+                                    <div class="flex-1 rounded overflow-hidden shadow-sm border border-white">
+                                        <img src="datas/data/8141.jpg" class="w-full h-full object-cover" />
+                                    </div>
+                                    <div class="flex-1 bg-white rounded shadow-sm border border-white p-2 flex flex-col items-center justify-center text-center">
+                                        <p class="text-[10px] text-primary font-bold italic mb-1">Lotus Home</p>
+                                        <p class="text-[9px] text-secondary leading-tight mb-2">Porselen Fincan Takımı</p>
+                                        <a href="collection.html?id=mothersday" class="text-[10px] font-bold border-b border-primary text-primary">İncele</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Erkek Dropdown -->
+                <div class="relative group py-4">
+                    <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors flex items-center gap-1" href="#">
+                        Erkek
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                    </a>
+                    <div class="absolute left-0 top-full hidden group-hover:block w-48 bg-white dark:bg-background shadow-xl rounded-xl border border-outline-variant/30 py-3 z-50">
+                        <a href="collection.html?category=Trousers" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Pantolon</a>
+                        <a href="collection.html?category=Nightwear" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Pijama</a>
+                        <a href="collection.html?category=Tshirts" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">T-Shirt</a>
+                        <a href="collection.html?category=Shirts" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Gömlek</a>
+                        <a href="collection.html?category=Briefs" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">İç Çamaşır</a>
+                        <a href="collection.html?category=Accessories" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Aksesuar</a>
+                    </div>
+                </div>
+
+                <!-- Kadın Dropdown -->
+                <div class="relative group py-4">
+                    <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors flex items-center gap-1" href="#">
+                        Kadın
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                    </a>
+                    <div class="absolute left-0 top-full hidden group-hover:block w-48 bg-white dark:bg-background shadow-xl rounded-xl border border-outline-variant/30 py-3 z-50">
+                        <a href="collection.html?category=Trousers" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Pantolon</a>
+                        <a href="collection.html?category=Nightwear" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Pijama</a>
+                        <a href="collection.html?category=Tshirts" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">T-Shirt</a>
+                        <a href="collection.html?category=Shirts" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Gömlek</a>
+                        <a href="collection.html?category=Briefs" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">İç Çamaşır</a>
+                        <a href="collection.html?category=Accessories" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Aksesuar</a>
+                    </div>
+                </div>
             </nav>
             <div class="flex items-center space-x-4">
             </br>
@@ -60,41 +262,109 @@ const Navbars = {
     </header>
     `,
     detail: `
-    <header class="bg-surface sticky top-0 z-50 shadow-sm w-full">
-        <nav class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 w-full max-w-container-max mx-auto">
-            <div class="flex-1 flex items-center justify-start hidden md:flex">
-                <div class="relative w-full max-w-xs">
-                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary" style="font-variation-settings: 'FILL' 0;">search</span>
-                    <input class="w-full bg-surface-container-lowest border border-outline-variant rounded px-10 py-2 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all font-body-md text-on-surface" placeholder="Ara..." type="text" />
+    <header class="bg-surface dark:bg-background shadow-sm dark:shadow-none docked full-width top-0 sticky z-50">
+        <div class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-container-max mx-auto">
+            <a class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-all active:scale-95 duration-200" href="main.html">HIKARI</a>
+            <div class="hidden md:flex flex-1 max-w-xl mx-8 relative">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary">search</span>
+                <input class="w-full pl-10 pr-4 py-3 rounded-DEFAULT border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/10 bg-surface-container-lowest text-on-surface font-body-md text-body-md outline-none transition-all" placeholder="Ürün, marka ve daha fazlasını arayın" type="text" />
+            </div>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors" href="main.html">Yeni Gelenler</a>
+                <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors" href="categories.html">Kategoriler</a>
+                
+                <!-- Koleksiyonlar Dropdown -->
+                <div class="relative group py-4">
+                    <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors flex items-center gap-1" href="#">
+                        Koleksiyonlar
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                    </a>
+                    <div class="absolute left-1/2 -translate-x-1/2 top-full hidden group-hover:block w-[600px] bg-white dark:bg-background shadow-xl rounded-xl border border-outline-variant/30 p-6 z-50">
+                        <div class="grid grid-cols-3 gap-6">
+                            <div class="space-y-4">
+                                <h4 class="font-bold text-primary text-sm uppercase tracking-wider border-b border-primary/10 pb-2">Öne Çıkanlar</h4>
+                                <ul class="space-y-3">
+                                    <li><a href="collection.html?id=mothersday" class="text-on-surface hover:text-primary transition-colors flex flex-col">
+                                        <span class="font-medium">Anneler Günü</span>
+                                        <span class="text-xs text-secondary italic">HIKARI & ÇiçekSepeti Özel</span>
+                                    </a></li>
+                                    <li><a href="collection.html?id=autumn" class="text-on-surface hover:text-primary transition-colors flex flex-col">
+                                        <span class="font-medium">Sonbahar Essentials</span>
+                                        <span class="text-xs text-secondary italic">Urban Boutique Seçkisi</span>
+                                    </a></li>
+                                    <li><a href="collection.html?id=urban" class="text-on-surface hover:text-primary transition-colors flex flex-col">
+                                        <span class="font-medium">Yaz Esintisi</span>
+                                        <span class="text-xs text-secondary italic">Beach Mode x HIKARI</span>
+                                    </a></li>
+                                </ul>
+                            </div>
+                            <div class="col-span-2 bg-surface-container-low rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-xs font-bold text-secondary uppercase">Haftanın Seçkisi: Anneler Günü</span>
+                                    <span class="bg-primary text-white text-[10px] px-2 py-0.5 rounded-full font-bold">YENİ</span>
+                                </div>
+                                <div class="flex gap-3 h-32">
+                                    <div class="flex-1 rounded overflow-hidden shadow-sm border border-white">
+                                        <img src="datas/data/54018.jpg" class="w-full h-full object-cover" />
+                                    </div>
+                                    <div class="flex-1 rounded overflow-hidden shadow-sm border border-white">
+                                        <img src="datas/data/8141.jpg" class="w-full h-full object-cover" />
+                                    </div>
+                                    <div class="flex-1 bg-white rounded shadow-sm border border-white p-2 flex flex-col items-center justify-center text-center">
+                                        <p class="text-[10px] text-primary font-bold italic mb-1">Lotus Home</p>
+                                        <p class="text-[9px] text-secondary leading-tight mb-2">Porselen Fincan Takımı</p>
+                                        <a href="collection.html?id=mothersday" class="text-[10px] font-bold border-b border-primary text-primary">İncele</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <button class="md:hidden p-2 text-primary hover:opacity-80 transition-all active:scale-95 duration-200">
-                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
-            </button>
-            <div class="flex-1 flex justify-center">
-                <a class="font-headline-lg text-headline-lg font-bold text-primary tracking-tight" href="main.html">HIKARI</a>
-            </div>
-            <div class="flex-1 flex justify-end gap-4 items-center">
-                <button class="p-2 text-primary hover:opacity-80 transition-all active:scale-95 duration-200 md:hidden">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">search</span>
+
+                <!-- Erkek Dropdown -->
+                <div class="relative group py-4">
+                    <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors flex items-center gap-1" href="#">
+                        Erkek
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                    </a>
+                    <div class="absolute left-0 top-full hidden group-hover:block w-48 bg-white dark:bg-background shadow-xl rounded-xl border border-outline-variant/30 py-3 z-50">
+                        <a href="collection.html?category=Trousers" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Pantolon</a>
+                        <a href="collection.html?category=Nightwear" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Pijama</a>
+                        <a href="collection.html?category=Tshirts" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">T-Shirt</a>
+                        <a href="collection.html?category=Shirts" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Gömlek</a>
+                        <a href="collection.html?category=Briefs" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">İç Çamaşır</a>
+                        <a href="collection.html?category=Accessories" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Aksesuar</a>
+                    </div>
+                </div>
+
+                <!-- Kadın Dropdown -->
+                <div class="relative group py-4">
+                    <a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed hover:text-primary transition-colors flex items-center gap-1" href="#">
+                        Kadın
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                    </a>
+                    <div class="absolute left-0 top-full hidden group-hover:block w-48 bg-white dark:bg-background shadow-xl rounded-xl border border-outline-variant/30 py-3 z-50">
+                        <a href="collection.html?category=Trousers" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Pantolon</a>
+                        <a href="collection.html?category=Nightwear" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Pijama</a>
+                        <a href="collection.html?category=Tshirts" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">T-Shirt</a>
+                        <a href="collection.html?category=Shirts" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Gömlek</a>
+                        <a href="collection.html?category=Briefs" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">İç Çamaşır</a>
+                        <a href="collection.html?category=Accessories" class="block px-6 py-2.5 text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors">Aksesuar</a>
+                    </div>
+                </div>
+            </nav>
+            <div class="flex items-center space-x-4">
+            </br>
+                <button aria-label="shopping_cart" onclick="window.location.href='cart.html'" class="text-secondary hover:text-primary transition-colors p-2 hover:bg-surface-container-high rounded-full relative">
+                    <span class="material-symbols-outlined">shopping_cart</span>
+                    <span id="cart-badge-detail" class="absolute top-0 right-0 bg-primary-container text-on-primary-container text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
                 </button>
-                <button onclick="window.location.href='cart.html'" class="p-2 text-primary hover:opacity-80 transition-all active:scale-95 duration-200 relative">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_cart</span>
-                    <span id="cart-badge-detail" class="absolute top-1 right-1 bg-primary-container text-on-primary-container text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
-                </button>
-                <button onclick="window.location.href='favorites.html'" class="p-2 text-primary hover:opacity-80 transition-all active:scale-95 duration-200 relative">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span>
-                    <span id="fav-badge-detail" class="absolute top-1 right-1 bg-primary-container text-on-primary-container text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                <button aria-label="favorite" onclick="window.location.href='favorites.html'" class="text-secondary hover:text-primary transition-colors p-2 hover:bg-surface-container-high rounded-full relative">
+                    <span class="material-symbols-outlined">favorite</span>
+                    <span id="fav-badge-detail" class="absolute top-0 right-0 bg-primary-container text-on-primary-container text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
                 </button>
                 <div id="auth-container" class="flex items-center"></div>
             </div>
-        </nav>
-        <div class="hidden md:flex justify-center items-center gap-8 pb-4 w-full max-w-container-max mx-auto px-margin-desktop bg-surface">
-            <a class="text-secondary hover:text-primary transition-colors font-body-md" href="#">Yeni Gelenler</a>
-            <a class="text-secondary hover:text-primary transition-colors font-body-md" href="categories.html">Kategoriler</a>
-            <a class="text-secondary hover:text-primary transition-colors font-body-md" href="#">Erkek</a>
-            <a class="text-primary border-b-2 border-primary pb-1 font-body-md" href="#">Kadın</a>
-            <a class="text-secondary hover:text-primary transition-colors font-body-md" href="#">İndirim</a>
         </div>
     </header>
     `,
@@ -341,6 +611,15 @@ function updateCartAndFavoritesBadges() {
 }
 
 // Global functions for adding to cart and favorites
+// Helper to get heart SVG
+window.getHeartSVG = function(isFilled) {
+    if (isFilled) {
+        return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width: 24px; height: 24px;"><path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.5 3c1.372 0 2.615.551 3.512 1.435.897-.884 2.14-1.435 3.512-1.435 2.786 0 5.25 2.322 5.25 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" /></svg>`;
+    } else {
+        return `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 24px; height: 24px;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>`;
+    }
+};
+
 window.toggleFavorite = function (productId, iconElement) {
     if (sessionStorage.getItem('isLoggedIn') !== 'true') {
         alert('Favorilere eklemek için lütfen giriş yapın.');
@@ -374,12 +653,13 @@ window.toggleFavorite = function (productId, iconElement) {
 
     // Visual Update
     if (iconElement) {
+        iconElement.innerHTML = getHeartSVG(isFavorite);
         if (isFavorite) {
-            iconElement.style.fontVariationSettings = "'FILL' 1";
-            iconElement.classList.add('text-primary'); // Make it colorful
+            iconElement.classList.add('text-error');
+            iconElement.classList.remove('text-secondary');
         } else {
-            iconElement.style.fontVariationSettings = "'FILL' 0";
-            iconElement.classList.remove('text-primary'); // Remove color if we added it
+            iconElement.classList.remove('text-error');
+            iconElement.classList.add('text-secondary');
         }
     }
 
@@ -487,5 +767,104 @@ function renderFooter(type) {
 window.formatPrice = function(price) {
     const val = parseFloat(price) || 0;
     return new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val) + ' TL';
+};
+
+window.getReviewCount = function(productId) {
+    if (typeof reviewsData === 'undefined' || !Array.isArray(reviewsData)) return 128;
+    
+    const cleanId = String(productId).trim();
+    const realCount = reviewsData.filter(r => String(r.productId).trim() === cleanId).length;
+    
+    // If we have real reviews, return them. 
+    // If not, generate a deterministic number based on the productId string 
+    // so it looks like real data but stays consistent.
+    if (realCount > 0) return realCount;
+    
+    // Deterministic "fake" count for products with no reviews in the dataset
+    let hash = 0;
+    for (let i = 0; i < cleanId.length; i++) {
+        hash = ((hash << 5) - hash) + cleanId.charCodeAt(i);
+        hash |= 0;
+    }
+    return Math.abs(hash % 150) + 20; // Returns something between 20 and 170
+};
+
+window.getStarsHTML = function(productId, baseRating) {
+    let rating = parseFloat(baseRating) || 5;
+    
+    // If we have real reviews, calculate the actual average
+    if (typeof reviewsData !== 'undefined' && Array.isArray(reviewsData)) {
+        const cleanId = String(productId).trim();
+        const productReviews = reviewsData.filter(r => String(r.productId).trim() === cleanId);
+        if (productReviews.length > 0) {
+            const sum = productReviews.reduce((acc, r) => acc + (parseFloat(r.overall) || 0), 0);
+            rating = sum / productReviews.length;
+        }
+    }
+    
+    let starsHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        if (rating >= i) {
+            starsHTML += `<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>`;
+        } else if (rating >= i - 0.5) {
+            starsHTML += `<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star_half</span>`;
+        } else {
+            starsHTML += `<span class="material-symbols-outlined text-surface-dim text-sm" style="font-variation-settings: 'FILL' 1;">star</span>`;
+        }
+    }
+    return starsHTML;
+};
+
+window.createProductCards = function(container, productsList, isGridOverride = null) {
+    if (!container) return;
+    let html = '';
+    
+    // Determine card width based on container layout or override
+    const isGrid = isGridOverride !== null ? isGridOverride : container.classList.contains('grid');
+    const cardWidthClass = isGrid ? 'w-full' : 'w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-start';
+
+    productsList.forEach((product) => {
+        const price = formatPrice(product.price);
+        const reviews = getReviewCount(product.image);
+        const starsHTML = getStarsHTML(product.image, product.stars);
+
+        const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
+        const isFav = userData.favorites && userData.favorites.includes(product.image);
+        const favColorClass = isFav ? "text-error" : "text-secondary";
+
+        const cardHTML = `
+            <div onclick="window.location.href='detail.html?id=${encodeURIComponent(product.image)}&reviews=${reviews}'"
+                class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer flex flex-col h-full ${cardWidthClass}">
+                <div class="relative aspect-[4/5] bg-surface-container-low overflow-hidden">
+                    <img alt="${product['display name']}"
+                        class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                        src="datas/data/${product.image}" />
+                    <button aria-label="Add to Favorites"
+                        class="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full transition-colors shadow-sm"
+                        onclick="event.stopPropagation(); toggleFavorite('${product.image}', this.querySelector('span'));">
+                        <span class="flex items-center justify-center ${favColorClass}">${getHeartSVG(isFav)}</span>
+                    </button>
+                </div>
+                <div class="p-4 flex flex-col flex-grow">
+                    <span class="font-label-sm text-label-sm text-secondary mb-1 uppercase tracking-wider truncate block">${product.category}</span>
+                    <h3 class="font-body-md text-body-md text-on-surface mb-2 line-clamp-2 min-h-[3rem] font-medium">${product['display name']}</h3>
+                    <div class="flex items-center gap-1 mb-3">
+                        ${starsHTML}
+                        <span class="font-label-sm text-label-sm text-secondary ml-1">(${reviews})</span>
+                    </div>
+                    <div class="mt-auto flex justify-between items-center">
+                        <span class="font-headline-md text-headline-md text-on-surface font-bold text-primary">${price}</span>
+                        <button aria-label="Add to cart"
+                            class="p-2 bg-surface-container rounded-lg text-on-surface hover:bg-primary hover:text-white transition-colors"
+                            onclick="event.stopPropagation(); addToCart('${product.image}');">
+                            <span class="material-symbols-outlined text-xl">add_shopping_cart</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        html += cardHTML;
+    });
+    container.insertAdjacentHTML('beforeend', html);
 };
 

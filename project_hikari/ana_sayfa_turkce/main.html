@@ -10,10 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
         rel="stylesheet" />
     <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0"
         rel="stylesheet" />
     <script id="tailwind-config">
         tailwind.config = {
@@ -117,6 +114,10 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
 
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+        }
+
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
         }
@@ -134,45 +135,132 @@
     <!-- Main Content -->
     <main
         class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 flex flex-col gap-12">
-        <!-- Hero Section (Bento Grid Style) -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 h-[500px]">
-            <div class="col-span-1 md:col-span-2 relative rounded-xl overflow-hidden shadow-sm group">
-                <img alt="Autumn Collection"
-                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    data-alt="A high-end fashion editorial photograph showing a model wearing a luxurious textured autumn coat. The lighting is soft and natural, creating a sophisticated and clean atmosphere. The overall aesthetic is minimal, elegant, and perfectly aligned with a premium modern e-commerce brand, utilizing warm neutral tones with a subtle hint of rich orange."
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkOQbmLa0AF_mhAK8NADejH3amLYpZJvU1NwkL_n8lwTV9qXp7GHz-BQxw0QjRgpHgl32HD6_Ty0wZb7XxN-RGKThqO6sPDiIzwRD5rrE4knJAstKzLSOubBLfXoFITJyIPSDMyALro7ijm1Amz3UgFAZ0iDL1WQafPmkbUMF8Z6pgfsPKBt7rF6utNU-_hZQalUyqzGnkd_tN4sNKQcOLMrBGfhcGWGDjZ1B0YBawUwqnSZSX8qunDoknBCpMfM5A9Ph7gZfw1Rg" />
-                <div
-                    class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8">
-                    <h2 class="font-headline-xl text-headline-xl text-white mb-2">Sonbahar Temelleri</h2>
-                    <p class="font-body-lg text-body-lg text-white/90 mb-6 max-w-md">Birinci sınıf konforun yeni
-                        standardını keşfedin. Modern gardırop için küratörlüğünde stiller.</p>
-                    <button
-                        class="bg-primary text-white font-label-md text-label-md py-3 px-8 rounded-lg w-fit hover:bg-primary-container transition-colors shadow-sm">Koleksiyonu
-                        İncele</button>
-                </div>
-            </div>
-            <div class="col-span-1 flex flex-col gap-6">
-                <div class="relative rounded-xl overflow-hidden shadow-sm h-full group">
-                    <img alt="Accessories"
+        
+        <!-- Unified Bento Showcase Dashboard -->
+        <div class="bg-surface-container-low rounded-3xl p-6 md:p-10 shadow-sm border border-outline-variant/10 flex flex-col gap-12">
+            <!-- Part 1: Hero Grid -->
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- 1. Main Hero Card -->
+                <div class="lg:col-span-2 relative rounded-2xl overflow-hidden shadow-md group h-[500px]">
+                    <img alt="Autumn Collection"
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        data-alt="A minimalist still life photograph of high-end leather shoes and a matching handbag resting on a pristine white surface. Soft, diffused lighting emphasizes the rich texture of the leather. The composition is clean, airy, and sophisticated, reflecting a modern light-mode luxury aesthetic."
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzy3NWVFDFzVFj4bPDocM009pnOGgbHVNBU3GwyKLrvezXDh9p7mC6QG-h5k6hLJgJx470qH2UkYY4eNrGyGUK8YC37kiWtNbjYp8P4PYuJkIVDSHYd5b_qI8e6ump7bvZ93DmXagnF15_1zmnwXwl0RJbhkKpGGCD6yMXjW8nTXJh4D2qY0D1jde0qCxdC6AaiW-fnj7ZtmFUuhBTo6M7BS7Uop0VnCVkpMN-DOb0sojoE28zFVOqzNdWEKTggvCjvjvotI-E3TA" />
-                    <div class="absolute inset-0 bg-black/20 flex flex-col justify-end p-6">
-                        <h3 class="font-headline-md text-headline-md text-white mb-1">Premium Aksesuarlar</h3>
-                        <a class="font-label-md text-label-md text-white hover:underline" href="#">Daha Fazlasını
-                            Keşfet</a>
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkOQbmLa0AF_mhAK8NADejH3amLYpZJvU1NwkL_n8lwTV9qXp7GHz-BQxw0QjRgpHgl32HD6_Ty0wZb7XxN-RGKThqO6sPDiIzwRD5rrE4knJAstKzLSOubBLfXoFITJyIPSDMyALro7ijm1Amz3UgFAZ0iDL1WQafPmkbUMF8Z6pgfsPKBt7rF6utNU-_hZQalUyqzGnkd_tN4sNKQcOLMrBGfhcGWGDjZ1B0YBawUwqnSZSX8qunDoknBCpMfM5A9Ph7gZfw1Rg" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-8">
+                        <span class="text-primary-fixed-dim font-bold text-xs uppercase tracking-[0.3em] mb-4">Yeni Sezon</span>
+                        <h2 class="font-headline-xl text-headline-xl text-white mb-4">Sonbahar Temelleri</h2>
+                        <p class="font-body-lg text-body-lg text-white/80 mb-8 max-w-md leading-relaxed">Birinci sınıf konforun yeni standardını keşfedin. Modern gardırop için küratörlüğünde stiller.</p>
+                        <button onclick="scrollToSection('autumn-curation')"
+                            class="bg-primary text-white font-label-md text-label-md py-4 px-10 rounded-xl w-fit hover:bg-primary-container transition-all shadow-lg active:scale-95">Koleksiyonu İncele</button>
                     </div>
                 </div>
-                <div
-                    class="relative rounded-xl overflow-hidden shadow-sm h-full group bg-surface-container flex items-center justify-center">
-                    <div class="text-center p-6">
-                        <span class="material-symbols-outlined text-primary text-4xl mb-2">local_shipping</span>
-                        <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Ücretsiz Global Teslimat</h3>
-                        <p class="font-body-md text-body-md text-secondary">200 TL üzerindeki tüm siparişlerde</p>
+
+                <!-- Part 2: Right Stack (Accessories & Shipping) -->
+                <div class="flex flex-col gap-6">
+                    <!-- 2. Accessory Card -->
+                    <div class="relative rounded-2xl overflow-hidden shadow-sm h-full group cursor-pointer border border-white/10" onclick="window.location.href='collection.html?category=Accessories'">
+                        <img alt="Accessories"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzy3NWVFDFzVFj4bPDocM009pnOGgbHVNBU3GwyKLrvezXDh9p7mC6QG-h5k6hLJgJx470qH2UkYY4eNrGyGUK8YC37kiWtNbjYp8P4PYuJkIVDSHYd5b_qI8e6ump7bvZ93DmXagnF15_1zmnwXwl0RJbhkKpGGCD6yMXjW8nTXJh4D2qY0D1jde0qCxdC6AaiW-fnj7ZtmFUuhBTo6M7BS7Uop0VnCVkpMN-DOb0sojoE28zFVOqzNdWEKTggvCjvjvotI-E3TA" />
+                        <div class="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors"></div>
+                        <div class="absolute inset-0 flex flex-col justify-center items-center text-center p-6">
+                            <h3 class="font-bold text-2xl text-white mb-2 tracking-tight">Premium Aksesuarlar</h3>
+                            <p class="text-white/70 text-sm border-b border-white/30 pb-1">Daha Fazlasını Keşfet</p>
+                        </div>
+                    </div>
+                    <!-- 3. Shipping Info Card -->
+                    <div class="bg-white rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-sm border border-outline-variant/10 group hover:border-primary/20 transition-all">
+                        <span class="material-symbols-outlined text-primary text-4xl mb-4 group-hover:scale-110 transition-transform">local_shipping</span>
+                        <h3 class="font-bold text-on-surface mb-1 text-lg">Ücretsiz Global Teslimat</h3>
+                        <p class="text-secondary text-sm">200 TL üzerindeki tüm siparişlerde</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Part 3: Curated Sellers Grid -->
+            <div id="autumn-curation" class="border-t border-outline-variant/10 pt-10">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
+                    <div>
+                        <span class="text-primary font-bold text-xs uppercase tracking-[0.2em] mb-2 block">Küratör Seçimleri</span>
+                        <h2 class="text-3xl font-bold text-on-surface">Günün Kürasyonu: Sonbahar</h2>
+                    </div>
+                    <div class="px-4 py-2 bg-white rounded-full text-[10px] font-bold text-secondary border border-outline-variant/10 flex items-center gap-2 shadow-sm">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Canlı Veri Akışı
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- 4. Seller Card 1 -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/5 flex flex-col gap-6 group hover:shadow-xl transition-all hover:-translate-y-1">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center text-primary font-bold border border-primary/10">HS</div>
+                            <div>
+                                <h4 class="font-bold text-on-surface text-lg">HIKARI Selection</h4>
+                                <p class="text-xs text-secondary italic">Premium Minimalist Stil</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="aspect-square bg-surface-container-lowest rounded-lg overflow-hidden">
+                                <img src="datas/data/22245.jpg" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                            </div>
+                            <div class="aspect-square bg-surface-container-lowest rounded-lg overflow-hidden">
+                                <img src="datas/data/22867.jpg" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                            </div>
+                            <div class="aspect-square bg-surface-container-lowest rounded-lg flex items-center justify-center border-2 border-dashed border-outline-variant/20">
+                                <span class="text-primary font-bold text-sm">+12</span>
+                            </div>
+                        </div>
+                        <a href="collection.html?id=autumn" class="text-center py-3 bg-primary/5 text-primary rounded-xl text-sm font-bold hover:bg-primary hover:text-white transition-all">Seçkiyi Gör</a>
+                    </div>
+
+                    <!-- 5. Seller Card 2 -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/5 flex flex-col gap-6 group hover:shadow-xl transition-all hover:-translate-y-1">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-secondary/5 flex items-center justify-center text-secondary font-bold border border-secondary/10">UB</div>
+                            <div>
+                                <h4 class="font-bold text-on-surface text-lg">Urban Boutique</h4>
+                                <p class="text-xs text-secondary italic">Modern Şehir Esintisi</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="aspect-square bg-surface-container-lowest rounded-lg overflow-hidden">
+                                <img src="datas/data/50945.jpg" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                            </div>
+                            <div class="aspect-square bg-surface-container-lowest rounded-lg flex items-center justify-center border-2 border-dashed border-outline-variant/20">
+                                <span class="text-primary font-bold text-sm">+8</span>
+                            </div>
+                            <div class="aspect-square bg-surface-container-lowest rounded-lg overflow-hidden">
+                                <img src="datas/data/26372.jpg" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                            </div>
+                        </div>
+                        <a href="collection.html?id=urban" class="text-center py-3 bg-primary/5 text-primary rounded-xl text-sm font-bold hover:bg-primary hover:text-white transition-all">Seçkiyi Gör</a>
+                    </div>
+
+                    <!-- 6. Seller Card 3 -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/5 flex flex-col gap-6 group hover:shadow-xl transition-all hover:-translate-y-1">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-600 font-bold border border-orange-100">AS</div>
+                            <div>
+                                <h4 class="font-bold text-on-surface text-lg">Autumn Spirit</h4>
+                                <p class="text-xs text-secondary italic">Sıcak & Samimi Dokular</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="aspect-square bg-surface-container-lowest rounded-lg flex items-center justify-center border-2 border-dashed border-outline-variant/20">
+                                <span class="text-primary font-bold text-sm">+5</span>
+                            </div>
+                            <div class="aspect-square bg-surface-container-lowest rounded-lg overflow-hidden">
+                                <img src="datas/data/14997.jpg" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                            </div>
+                            <div class="aspect-square bg-surface-container-lowest rounded-lg overflow-hidden">
+                                <img src="datas/data/1584.jpg" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                            </div>
+                        </div>
+                        <a href="collection.html?id=autumnspirit" class="text-center py-3 bg-primary/5 text-primary rounded-xl text-sm font-bold hover:bg-primary hover:text-white transition-all">Seçkiyi Gör</a>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+
         <!-- Category Circles -->
         <section class="py-4">
             <br>
@@ -183,7 +271,6 @@
                     <div
                         class="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow relative">
                         <img alt="T-Shirts" class="absolute inset-0 w-full h-full object-cover"
-                            data-alt="A clean, isolated product shot of a perfectly folded, premium white cotton t-shirt on a light grey background. Bright, even studio lighting ensures the texture of the fabric is visible. The image embodies minimal, structural perfection."
                             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQk9-UqrpgObl8ujrXMk-wpFz8SVjKQkcV1j64IWjFa2XLzWbkTXJ4qNLDvw64B8cpDk821s8AtbbF9Y6Yyt7eI-0qdFvFQyQ_kfPnfR0U75Sov48CVzsKOhPu4VzqAF0380DPizeojhMSmxtBBsOvvECYcdLCA8T0d8CgUpi7nXnHfRrXwluGLwkSQsKZfD1KEad55sKFMJopxkCBiTvkWpf1IHO-g-6oRAn0K9vTvF2qZIolBXs2zCHmB-Asy4rzx9vMHmVp86U" />
                     </div>
                     <span
@@ -193,7 +280,6 @@
                     <div
                         class="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow relative">
                         <img alt="Jackets" class="absolute inset-0 w-full h-full object-cover"
-                            data-alt="A detailed close-up shot of a sophisticated tailored jacket, focusing on the refined stitching and premium fabric texture. The background is a soft, neutral off-white. The lighting is diffused and high-key, conveying a sense of luxury and modern minimalism."
                             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBW8qoDqRaP5zBgZfFALV3brwfSoGIXcpvKMwjrnbVORXMzfc5ME6Ffw4ZrYiQtNV4ENhelffq5KpJwX4_JTZmQks7NgSO8YCRiZJJU86n5s1jJKrWlXDdK7ikIVuCRHuaNHUbHSAZ4JXuYc6JDWclKWSIpzGXwIFeF7VWS75Buv_SenrC8b0ThM0C9cB5EX1kcFEj-bf0goU2Jkx_HHg3QWu6qUYY4xrVM7qHCY5oKCinU0cYDgSvroKe_1u2GE0BE8m01AzkQ3MM" />
                     </div>
                     <span
@@ -203,7 +289,6 @@
                     <div
                         class="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow relative">
                         <img alt="Sneakers" class="absolute inset-0 w-full h-full object-cover"
-                            data-alt="A pristine white sneaker photographed from a profile angle against a very light grey surface. The studio lighting casts a soft, subtle shadow beneath the shoe, emphasizing its clean lines and modern design. The look is ultra-minimal and high-end."
                             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKdWlLiEJY-v__f4oHKXNo-gY0cop7asa6dUzg4O1zcmZezrWsK-Vbqoa20g7FI-3Uo-ekcXuspA3dFYuQf4AM1bWmessNpP2JfDP0llS65YClt0a17wZmKob2GzGtocTzZjMOEFejG3Cr8Aubolh2KtoLfiZfAtwaWFYJ7dKk_ks2ONLlMXu67_-C_FdAqTSqPkVaKnIVaRLgnG_-yt9G_rMjRV9oZhy3lYUL4sXEpsBUwHmk66f8YSnek0oSqia1p0_M4aTMocY" />
                     </div>
                     <span
@@ -214,7 +299,6 @@
                     <div
                         class="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow relative">
                         <img alt="Accessories" class="absolute inset-0 w-full h-full object-cover"
-                            data-alt="A carefully arranged composition of a sleek modern watch and minimal metal rings on a smooth, pale stone surface. Bright, crisp light highlights the metallic finishes against the muted background. The aesthetic is organized luxury and contemporary sophistication."
                             src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPp_pzChKqq5bgR40l6qKyOVgSAaSJT3nynxJ3gwGqvQyb2cHF9ndyLKGvCoQ6y2MDBQqSE9fqHDBwdtaYxIHeno1_JF36ZEUWbUxrSE-z3DGyBP7NLhlufUzwETVK0Q09c2azdV03amexPUuRM4Mqc0z7PBxWhtzz4eRbnVBxMVlak3C0IZrbpB-_5R59ZbKl3WYwyuwH8VBMGmpzgd8TjUJmigSXB__2TU167Jbf1251uVW_WPDkqaGTMonJnWbw1D0SfLtDOwc" />
                     </div>
                     <span
@@ -246,198 +330,23 @@
                     </button>
                 </div>
             </div>
-            <div class="relative group">
+            <div class="relative">
                 <div id="recommended-products-grid"
                     class="flex overflow-x-auto snap-x scroll-smooth gap-gutter scrollbar-hide pb-4">
-                    <!-- Product Card 1 -->
-                    <div onclick="window.location.href='detail.html'"
-                        class="bg-surface-container-lowest rounded-DEFAULT overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer flex flex-col h-full">
-                        <div class="relative aspect-[4/5] bg-surface-container-low overflow-hidden">
-                            <img alt="Minimalist Watch"
-                                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                                data-alt="A close-up product photograph of a modern, minimalist wristwatch with a clean white dial and a smooth tan leather strap. The watch is presented on a stark white background with a very soft, diffused shadow. The lighting is crisp and even, highlighting the premium quality of the materials."
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9WaRoVuDBo4iL2kdcX6IwyeRcf2J36Nmg8eQcIkmpymoR8_TZYAp-1af55_rw7zpGRkL3OULzxWsTyBwnnnbSQg9BaBCd3YljSAF_4uuZ7EZdiakBDmZMN9JwzKJ2G8gsfxMQjGqWvcCfgMYj3Gzi5b6EMTNPI2g0NebS7LUWPsJMsa2MrHSYH78UROvXIcLykgYF0acgqSI_anRQyk47v0WlnZJYy0OOAhOAe4BCfkIi5CIAtWkqzJynFF50yzY3JKh1WdaMGWo" />
-                            <button aria-label="Add to Favorites"
-                                class="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full text-secondary hover:text-primary transition-colors shadow-sm">
-                                <span class="material-symbols-outlined text-xl">favorite</span>
-                            </button>
-                        </div>
-                        <div class="p-4 flex flex-col flex-grow">
-                            <span
-                                class="font-label-sm text-label-sm text-secondary mb-1 uppercase tracking-wider">Hikari
-                                Saatler</span>
-                            <h3 class="font-body-md text-body-md text-on-surface mb-2 line-clamp-2">Klasik Minimalist
-                                Deri
-                                Saat</h3>
-                            <div class="flex items-center gap-1 mb-3">
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-surface-dim text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="font-label-sm text-label-sm text-secondary ml-1">(42)</span>
-                            </div>
-                            <div class="mt-auto flex justify-between items-center">
-                                <span class="font-headline-md text-headline-md text-on-surface">149,00 TL</span>
-                                <button aria-label="Add to cart"
-                                    class="p-2 bg-surface-container rounded-DEFAULT text-on-surface hover:bg-primary hover:text-white transition-colors">
-                                    <span class="material-symbols-outlined text-xl">add_shopping_cart</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Product Card 2 -->
-                    <div onclick="window.location.href='detail.html'"
-                        class="bg-surface-container-lowest rounded-DEFAULT overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer flex flex-col h-full">
-                        <div class="relative aspect-[4/5] bg-surface-container-low overflow-hidden">
-                            <span
-                                class="absolute top-3 left-3 bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm py-1 px-2 rounded-full z-10">Yeni
-                                Gelen</span>
-                            <img alt="Silk Blouse"
-                                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                                data-alt="A refined product shot of a luxurious cream-colored silk blouse hanging elegantly against a pale, neutral background. Soft, sophisticated lighting creates subtle highlights on the silk fabric, emphasizing its drape and premium quality. The composition is highly minimal and airy."
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAamc6DkIOd1sWk1ynSWeetcSdOzS0dBr5jyBMH3EkUwOJt6dMInm6hbYJajj-HTfmGUPVlnmRqVJRHWER-D_QFMPhhxgfYqzYNhU8KhK2VUsvjSUhrVQD0TAgr_w4J6vtpe3KVVv3SVSGPwKh4kRpUdz40XjMOAVJSgAK9DZdfAAcHiIahRDgu36ToxL9-vujBwEtZKCXyfpItxByaVjhIYQkr32bMhLtiS_ttHodBnw3S6CpfCASzaXzdag5ObB4k8r_rDH0Y2F8" />
-                            <button aria-label="Add to Favorites"
-                                class="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full text-secondary hover:text-primary transition-colors shadow-sm">
-                                <span class="material-symbols-outlined text-xl">favorite</span>
-                            </button>
-                        </div>
-                        <div class="p-4 flex flex-col flex-grow">
-                            <span
-                                class="font-label-sm text-label-sm text-secondary mb-1 uppercase tracking-wider">Atelier</span>
-                            <h3 class="font-body-md text-body-md text-on-surface mb-2 line-clamp-2">Saf İpek Drapeli
-                                Bluz
-                            </h3>
-                            <div class="flex items-center gap-1 mb-3">
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="font-label-sm text-label-sm text-secondary ml-1">(18)</span>
-                            </div>
-                            <div class="mt-auto flex justify-between items-center">
-                                <span class="font-headline-md text-headline-md text-on-surface">225,00 TL</span>
-                                <button aria-label="Add to cart"
-                                    class="p-2 bg-surface-container rounded-DEFAULT text-on-surface hover:bg-primary hover:text-white transition-colors">
-                                    <span class="material-symbols-outlined text-xl">add_shopping_cart</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Product Card 3 -->
-                    <div onclick="window.location.href='detail.html'"
-                        class="bg-surface-container-lowest rounded-DEFAULT overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer flex flex-col h-full hidden md:flex">
-                        <div class="relative aspect-[4/5] bg-surface-container-low overflow-hidden">
-                            <img alt="Cotton Hoodie"
-                                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                                data-alt="A clean, flat-lay product image of a premium, heavyweight cotton hoodie in a muted sage green color. The hoodie is laid out symmetrically on an impeccable white surface. Bright studio lighting removes harsh shadows, presenting a modern, utilitarian aesthetic."
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgMl4OON3z6TifDqP9i4mdrxfl0_6coPtMVzQ8X1OO_XIuVBV6tveYsEXV_4IlI0k9CV0dryW1hoy5MwzNre46D3ha_bCIzshLAztQt-DbD-mko9xqCyXlcFHL-Uk28teEyjbcMAlbgdNfAeFZ5VcGBh2VcDiYk2dVyGjHLcRlOw9i3J6aPHS-izXb8tbFoMXen6Nth_6vxQUO7aI3IGcN3x1dYBwdTbjdqezUCBICXARjQyVADTaYV66Z0rPxY-yGc7kyAzbzT44" />
-                            <button aria-label="Add to Favorites"
-                                class="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full text-secondary hover:text-primary transition-colors shadow-sm">
-                                <span class="material-symbols-outlined text-xl">favorite</span>
-                            </button>
-                        </div>
-                        <div class="p-4 flex flex-col flex-grow">
-                            <span class="font-label-sm text-label-sm text-secondary mb-1 uppercase tracking-wider">Temel
-                                Parçalar</span>
-                            <h3 class="font-body-md text-body-md text-on-surface mb-2 line-clamp-2">Ağır Pamuklu
-                                Kapüşonlu
-                                Üst</h3>
-                            <div class="flex items-center gap-1 mb-3">
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-surface-dim text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star_half</span>
-                                <span class="font-label-sm text-label-sm text-secondary ml-1">(105)</span>
-                            </div>
-                            <div class="mt-auto flex justify-between items-center">
-                                <span class="font-headline-md text-headline-md text-on-surface">85,00 TL</span>
-                                <button aria-label="Add to cart"
-                                    class="p-2 bg-surface-container rounded-DEFAULT text-on-surface hover:bg-primary hover:text-white transition-colors">
-                                    <span class="material-symbols-outlined text-xl">add_shopping_cart</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Product Card 4 -->
-                    <div onclick="window.location.href='detail.html'"
-                        class="bg-surface-container-lowest rounded-DEFAULT overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer flex flex-col h-full hidden md:flex">
-                        <div class="relative aspect-[4/5] bg-surface-container-low overflow-hidden">
-                            <img alt="Canvas Sneakers"
-                                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                                data-alt="A stylized product photograph of a pair of classic canvas sneakers in a soft off-white color. They are positioned dynamically against a pale, neutral backdrop. Crisp, bright lighting casts a very soft, diffuse shadow, maintaining a clean, premium e-commerce look."
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnkI7F1cIEP_LsWYEff6R62IQqoOLFzI2MdUpvcVA4pS4dnQgsopuFCv0mzy1vfVbmpVBziXo9JJXYxvc3IX6mD9NgG-wpmD0p2Y1eyBRtpoprKqcBdAnTHbCMEMUmZY6EjKCTm3fb-Ze8hi2KHpl14fJ2e7BwKEXfiIIV9sD2JMIpCQfweddh9fM2paWD0s2wru49twrTdOqc16KMNGyIAxXn4vomLUB4lDYaWwCyRzxKiszQagWUZ_z7ijaZujJMAJdra7bMEU4" />
-                            <button aria-label="Add to Favorites"
-                                class="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full text-secondary hover:text-primary transition-colors shadow-sm">
-                                <span class="material-symbols-outlined text-xl">favorite</span>
-                            </button>
-                        </div>
-                        <div class="p-4 flex flex-col flex-grow">
-                            <span
-                                class="font-label-sm text-label-sm text-secondary mb-1 uppercase tracking-wider">Ayakkabı</span>
-                            <h3 class="font-body-md text-body-md text-on-surface mb-2 line-clamp-2">Klasik Kanvas
-                                Sneaker
-                            </h3>
-                            <div class="flex items-center gap-1 mb-3">
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-primary text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-surface-dim text-sm"
-                                    style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="font-label-sm text-label-sm text-secondary ml-1">(210)</span>
-                            </div>
-                            <div class="mt-auto flex justify-between items-center">
-                                <span class="font-headline-md text-headline-md text-on-surface">65,00 TL</span>
-                                <button aria-label="Add to cart"
-                                    class="p-2 bg-surface-container rounded-DEFAULT text-on-surface hover:bg-primary hover:text-white transition-colors">
-                                    <span class="material-symbols-outlined text-xl">add_shopping_cart</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
+            </div>
         </section>
         <!-- Discover Products Slider -->
         <section class="relative">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="font-headline-lg text-headline-lg text-on-surface">Keşfedebileceğin Ürünler</h2>
-                <div class="flex items-center gap-2">
-                    <button onclick="scrollSlider('discover-products-grid', -1)"
-                        class="bg-white rounded-full w-10 h-10 flex items-center justify-center border border-surface-variant text-secondary hover:text-primary transition-colors hover:border-primary">
-                        <span class="material-symbols-outlined">arrow_back</span>
-                    </button>
-                    <button onclick="loadAndScrollNext('discover-products-grid')"
-                        class="bg-white rounded-full w-10 h-10 flex items-center justify-center border border-surface-variant text-secondary hover:text-primary transition-colors hover:border-primary">
-                        <span class="material-symbols-outlined">arrow_forward</span>
-                    </button>
-                </div>
             </div>
-            <div class="relative group">
+            <div class="relative">
                 <div id="discover-products-grid"
-                    class="flex overflow-x-auto snap-x scroll-smooth gap-gutter scrollbar-hide pb-4">
+                    class="grid grid-cols-2 md:grid-cols-4 gap-6 pb-4">
                 </div>
+                <!-- Loading Trigger -->
+                <div id="load-more-trigger" class="h-10 w-full"></div>
             </div>
         </section>
     </main>
@@ -482,71 +391,6 @@
             }
         }
 
-        function createProductCards(container, productsList) {
-            if (!container) return;
-            let html = '';
-            productsList.forEach((product, index) => {
-                const price = formatPrice(product.price);
-                const rating = product.stars || 5;
-
-                let reviews = 128; // fallback
-                if (typeof reviewsData !== 'undefined') {
-                    const allProductReviews = reviewsData.filter(r => r.productId === product.image);
-                    reviews = allProductReviews.length;
-                }
-
-                let starsHTML = '';
-                for (let i = 1; i <= 5; i++) {
-                    if (rating >= i) {
-                        starsHTML += `<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>`;
-                    } else if (rating >= i - 0.5) {
-                        starsHTML += `<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star_half</span>`;
-                    } else {
-                        starsHTML += `<span class="material-symbols-outlined text-surface-dim text-sm" style="font-variation-settings: 'FILL' 1;">star</span>`;
-                    }
-                }
-
-                const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
-                const isFav = userData.favorites && userData.favorites.includes(product.image);
-                const favFill = isFav ? "1" : "0";
-                const favColorClass = isFav ? "text-primary" : "";
-
-                const cardHTML = `
-                    <div onclick="window.location.href='detail.html?id=${encodeURIComponent(product.image)}&reviews=${reviews}'"
-                        class="bg-surface-container-lowest rounded-DEFAULT overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer flex flex-col h-full w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-start">
-                        <div class="relative aspect-[4/5] bg-surface-container-low overflow-hidden">
-                            <img alt="${product['display name']}"
-                                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                                src="datas/data/${product.image}" />
-                            <button aria-label="Add to Favorites"
-                                class="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full text-secondary hover:text-primary transition-colors shadow-sm"
-                                onclick="event.stopPropagation(); toggleFavorite('${product.image}', this.querySelector('span'));">
-                                <span class="material-symbols-outlined text-xl ${favColorClass}" style="font-variation-settings: 'FILL' ${favFill};">favorite</span>
-                            </button>
-                        </div>
-                        <div class="p-4 flex flex-col flex-grow">
-                            <span class="font-label-sm text-label-sm text-secondary mb-1 uppercase tracking-wider truncate block">${product.category}</span>
-                            <h3 class="font-body-md text-body-md text-on-surface mb-2 line-clamp-2 min-h-[3rem]">${product['display name']}</h3>
-                            <div class="flex items-center gap-1 mb-3">
-                                ${starsHTML}
-                                <span class="font-label-sm text-label-sm text-secondary ml-1">(${reviews})</span>
-                            </div>
-                            <div class="mt-auto flex justify-between items-center">
-                                <span class="font-headline-md text-headline-md text-on-surface">${price}</span>
-                                <button aria-label="Add to cart"
-                                    class="p-2 bg-surface-container rounded-DEFAULT text-on-surface hover:bg-primary hover:text-white transition-colors"
-                                    onclick="event.stopPropagation(); addToCart('${product.image}');">
-                                    <span class="material-symbols-outlined text-xl">add_shopping_cart</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                html += cardHTML;
-            });
-            container.insertAdjacentHTML('beforeend', html);
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             const grid = document.getElementById('recommended-products-grid');
             const discoverGrid = document.getElementById('discover-products-grid');
@@ -559,18 +403,40 @@
 
             try {
                 const products = productsData || [];
-
-                // Get 16 random products to start with
-                const shuffled = products.sort(() => 0.5 - Math.random());
+                const shuffled = [...products].sort(() => 0.5 - Math.random());
+                
                 const recommended = shuffled.slice(0, 8);
-                const discover = shuffled.slice(8, 16);
+                const discover = shuffled.slice(8, 24); // Load more initially
 
                 createProductCards(grid, recommended);
                 createProductCards(discoverGrid, discover);
+
+                // Setup Infinite Scroll
+                let discoverIndex = 24;
+                const observer = new IntersectionObserver((entries) => {
+                    if (entries[0].isIntersecting) {
+                        const nextBatch = shuffled.slice(discoverIndex, discoverIndex + 4);
+                        if (nextBatch.length > 0) {
+                            createProductCards(discoverGrid, nextBatch);
+                            discoverIndex += 4;
+                        }
+                    }
+                }, { rootMargin: '100px' });
+
+                const trigger = document.getElementById('load-more-trigger');
+                if (trigger) observer.observe(trigger);
+
             } catch (error) {
                 console.error("Error fetching products:", error);
             }
         });
+
+        window.scrollToSection = function(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
     </script>
 </body>
 
