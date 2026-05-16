@@ -151,7 +151,7 @@ export default function Header({ type = 'main' }) {
                 </nav>
                 
                 <div className="flex items-center space-x-4">
-                    <button aria-label="shopping_cart" onClick={() => window.location.href='/cart'} className="text-secondary hover:text-primary transition-colors p-2 hover:bg-surface-container-high rounded-full relative">
+                    <button aria-label="shopping_cart" onClick={() => window.location.href='/cart'} className="text-secondary hover:text-primary transition-colors p-2 hover:bg-surface-container-high rounded-full relative cursor-pointer">
                         <span className="material-symbols-outlined">shopping_cart</span>
                         {cartCount > 0 && (
                             <span className={`absolute top-0 right-0 bg-primary-container text-on-primary-container text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center transition-transform duration-300 ${isCartBumping ? 'scale-150' : 'scale-100'}`}>
@@ -159,7 +159,7 @@ export default function Header({ type = 'main' }) {
                             </span>
                         )}
                     </button>
-                    <button aria-label="favorite" onClick={() => window.location.href='/favorites'} className="text-secondary hover:text-primary transition-colors p-2 hover:bg-surface-container-high rounded-full relative">
+                    <button aria-label="favorite" onClick={() => window.location.href='/favorites'} className="text-secondary hover:text-primary transition-colors p-2 hover:bg-surface-container-high rounded-full relative cursor-pointer">
                         <span className="material-symbols-outlined">favorite</span>
                         {favCount > 0 && (
                             <span className="absolute top-0 right-0 bg-primary-container text-on-primary-container text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">

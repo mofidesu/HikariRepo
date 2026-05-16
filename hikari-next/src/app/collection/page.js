@@ -66,7 +66,7 @@ function CollectionContent() {
         <main className="flex-grow">
             {/* Hero Section */}
             <section className="relative h-[60vh] min-h-[400px] flex items-center overflow-hidden">
-                <img src={data.heroImage} className="absolute inset-0 w-full h-full object-cover" alt="Banner" />
+                {data.heroImage ? <img src={data.heroImage} className="absolute inset-0 w-full h-full object-cover" alt="Banner" /> : null}
                 <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
                 <div className="relative w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop text-white">
                     <div className="max-w-2xl">

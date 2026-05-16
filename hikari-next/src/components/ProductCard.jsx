@@ -112,11 +112,23 @@ export default function ProductCard({ product, isGrid = false }) {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
         if (rating >= i) {
-            stars.push(<span key={i} className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>);
+            stars.push(
+                <svg key={i} viewBox="0 0 24 24" fill="currentColor" className="w-[18px] h-[18px] text-primary">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                </svg>
+            );
         } else if (rating >= i - 0.5) {
-            stars.push(<span key={i} className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star_half</span>);
+            stars.push(
+                <svg key={i} viewBox="0 0 24 24" fill="currentColor" className="w-[18px] h-[18px] text-primary">
+                    <path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4V6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z" />
+                </svg>
+            );
         } else {
-            stars.push(<span key={i} className="material-symbols-outlined text-surface-dim text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>);
+            stars.push(
+                <svg key={i} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-surface-dim">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+            );
         }
     }
 
@@ -128,7 +140,7 @@ export default function ProductCard({ product, isGrid = false }) {
                     className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                     src={`/datas/data/${product.image}`} />
                 <button aria-label="Add to Favorites"
-                    className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full transition-colors shadow-sm"
+                    className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full transition-colors shadow-sm cursor-pointer"
                     onClick={handleToggleFavorite}>
                     <span className={`flex items-center justify-center ${isFav ? 'text-error' : 'text-secondary'}`}>
                         {getHeartSVG(isFav)}
@@ -145,7 +157,7 @@ export default function ProductCard({ product, isGrid = false }) {
                 <div className="mt-auto flex justify-between items-center">
                     <span className="font-headline-md text-headline-md text-on-surface font-bold text-primary">{price}</span>
                     <button aria-label="Add to cart"
-                        className="p-2 bg-surface-container rounded-lg text-on-surface hover:bg-primary hover:text-white transition-colors"
+                        className="p-2 bg-surface-container rounded-lg text-on-surface hover:bg-primary hover:text-white transition-colors cursor-pointer"
                         onClick={handleAddToCart}>
                         <span className="material-symbols-outlined text-xl">add_shopping_cart</span>
                     </button>

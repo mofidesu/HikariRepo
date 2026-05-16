@@ -12,6 +12,26 @@ const formatPrice = (price) => {
     return new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val) + ' TL';
 };
 
+const HighlightText = ({ text, highlight }) => {
+    if (!highlight || !highlight.trim() || !text) {
+        return <>{text}</>;
+    }
+    // Escape special regex characters
+    const escapedHighlight = highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedHighlight})`, 'gi');
+    const parts = text.toString().split(regex);
+    
+    return (
+        <>
+            {parts.map((part, i) => 
+                part.toLowerCase() === highlight.toLowerCase() ? 
+                    <mark key={i} className="bg-primary/20 text-primary font-medium px-1 rounded">{part}</mark> 
+                    : <span key={i}>{part}</span>
+            )}
+        </>
+    );
+};
+
 function ReviewsContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -180,23 +200,23 @@ function ReviewsContent() {
                 <span>{product.category}</span>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* Left Column */}
-                <div className="w-full lg:w-1/3 xl:w-1/4 flex flex-col gap-6">
+                <div className="lg:col-span-4 xl:col-span-3 flex flex-col gap-6">
                     {/* Product Quick Card */}
                     <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm flex gap-4 items-start lg:sticky lg:top-24">
                         <div className="w-20 h-24 flex-shrink-0 border border-gray-100 rounded overflow-hidden">
                             <img alt={product['display name']} className="w-full h-full object-cover" src={`/datas/data/${product.image}`} />
                         </div>
-                        <div className="flex-col flex gap-1">
-                            <h2 className="text-sm font-medium text-gray-900 leading-tight">{product['display name']}</h2>
-                            <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                        <div className="flex-1 flex flex-col gap-1 min-w-0">
+                            <h2 className="text-sm font-medium text-gray-900 leading-tight truncate sm:whitespace-normal">{product['display name']}</h2>
+                            <div className="flex flex-wrap items-center gap-1 text-xs text-gray-500 mt-1">
                                 {renderStars(product.stars || 5)}
-                                <span>{actualReviewCount} Değerlendirme</span>
+                                <span className="whitespace-nowrap">{actualReviewCount} Değerlendirme</span>
                             </div>
-                            <div className="mt-2 flex items-baseline gap-2">
+                            <div className="mt-2 flex flex-wrap items-baseline gap-2">
                                 <span className="text-lg font-bold text-gray-900">{formatPrice(product.price)}</span>
-                                <span className="text-sm text-gray-400 line-through">{formatPrice(product.price * 1.25)}</span>
+                                <span className="text-sm text-gray-400 line-through whitespace-nowrap">{formatPrice(product.price * 1.25)}</span>
                             </div>
                             <button onClick={handleAddToCart} className="mt-3 w-full bg-primary text-white py-2 rounded-lg text-sm font-medium hover:bg-primary-container transition-colors">Sepete Ekle</button>
                         </div>
@@ -232,7 +252,7 @@ function ReviewsContent() {
                 </div>
 
                 {/* Right Column */}
-                <div className="w-full lg:w-2/3 xl:w-3/4 flex flex-col gap-8">
+                <div className="lg:col-span-8 xl:col-span-9 flex flex-col gap-8 min-w-0">
                     {/* Header */}
                     <div className="flex flex-col gap-4">
                         <div className="flex items-end justify-between">
@@ -247,8 +267,8 @@ function ReviewsContent() {
                         </div>
 
                         {/* Search & Sort */}
-                        <div className="flex gap-4">
-                            <div className="relative flex-grow">
+                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center w-full">
+                            <div className="relative flex-1 w-full min-w-0">
                                 <input defaultValue={searchParam} onKeyDown={handleSearch} className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary" placeholder="Değerlendirmelerde Ara" type="text" />
                                 <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-primary">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -294,7 +314,7 @@ function ReviewsContent() {
                                         <span>•</span>
                                         <span>{review.reviewTime}</span>
                                     </div>
-                                    <p className="text-sm text-gray-800 leading-relaxed">{review.reviewText}</p>
+                                    <p className="text-sm text-gray-800 leading-relaxed"><HighlightText text={review.reviewText} highlight={searchParam} /></p>
                                     <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
                                         <span>HIKARI satıcısından alındı</span>
                                     </div>
