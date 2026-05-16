@@ -67,16 +67,16 @@ export default function Home() {
             <main className="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 flex flex-col gap-12">
                 
                 {/* Unified Bento Showcase Dashboard */}
-                <div className="bg-surface-container-low rounded-3xl p-6 md:p-10 shadow-sm border border-outline-variant/10 flex flex-col gap-12">
+                <div className="bg-surface-container rounded-3xl p-6 md:p-10 shadow-sm border border-outline-variant/10 flex flex-col gap-12">
                     {/* Part 1: Hero Grid */}
                     <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* 1. Main Hero Card */}
                         <div className="lg:col-span-2 relative rounded-2xl overflow-hidden shadow-md group h-[500px]">
                             <img alt="Autumn Collection"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkOQbmLa0AF_mhAK8NADejH3amLYpZJvU1NwkL_n8lwTV9qXp7GHz-BQxw0QjRgpHgl32HD6_Ty0wZb7XxN-RGKThqO6sPDiIzwRD5rrE4knJAstKzLSOubBLfXoFITJyIPSDMyALro7ijm1Amz3UgFAZ0iDL1WQafPmkbUMF8Z6pgfsPKBt7rF6utNU-_hZQalUyqzGnkd_tN4sNKQcOLMrBGfhcGWGDjZ1B0YBawUwqnSZSX8qunDoknBCpMfM5A9Ph7gZfw1Rg" />
+                                src="/datas/data/autumn_hero.png" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-8">
-                                <span className="text-primary-fixed-dim font-bold text-xs uppercase tracking-[0.3em] mb-4">Yeni Sezon</span>
+                                <span className="text-white font-bold text-xs uppercase tracking-[0.3em] mb-4">Yeni Sezon</span>
                                 <h2 className="font-headline-xl text-headline-xl text-white mb-4">Sonbahar Temelleri</h2>
                                 <p className="font-body-lg text-body-lg text-white/80 mb-8 max-w-md leading-relaxed">Birinci sınıf konforun yeni standardını keşfedin. Modern gardırop için küratörlüğünde stiller.</p>
                                 <button onClick={() => scrollToSection('autumn-curation')}

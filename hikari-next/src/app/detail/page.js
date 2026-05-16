@@ -142,13 +142,13 @@ function DetailContent() {
     for (let i = 1; i <= 5; i++) {
         if (rating >= i) {
             stars.push(
-                <svg key={i} viewBox="0 0 24 24" fill="currentColor" className="w-[20px] h-[20px] text-primary">
+                <svg key={i} viewBox="0 0 24 24" fill="currentColor" className="w-[20px] h-[20px] text-amber-500">
                     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                 </svg>
             );
         } else if (rating >= i - 0.5) {
             stars.push(
-                <svg key={i} viewBox="0 0 24 24" fill="currentColor" className="w-[20px] h-[20px] text-primary">
+                <svg key={i} viewBox="0 0 24 24" fill="currentColor" className="w-[20px] h-[20px] text-amber-500">
                     <path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4V6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z" />
                 </svg>
             );

@@ -21,7 +21,11 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body className="bg-background text-on-background min-h-screen flex flex-col font-body-lg">
+      <body className="bg-background text-on-background min-h-screen flex flex-col font-body-lg relative overflow-x-hidden">
+        {/* Global Background Elements */}
+        <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-fixed/30 rounded-full blur-3xl z-[-1] pointer-events-none"></div>
+        <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-tertiary-fixed/30 rounded-full blur-3xl z-[-1] pointer-events-none"></div>
+        
         {children}
       </body>
     </html>

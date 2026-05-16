@@ -94,10 +94,7 @@ export default function Login() {
 
     return (
         <div className="bg-background text-on-background antialiased min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
-            {/* Background Elements */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-fixed/30 rounded-full blur-3xl z-0 pointer-events-none"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-tertiary-fixed/30 rounded-full blur-3xl z-0 pointer-events-none"></div>
-
+            {/* Background Elements removed (now in layout.js) */}
             {/* Back to Home */}
             <Link href="/" className="absolute top-8 left-8 md:top-12 md:left-12 flex items-center gap-2 text-secondary hover:text-primary transition-colors z-20 group">
                 <span className="material-symbols-outlined transform group-hover:-translate-x-1 transition-transform">arrow_back</span>
@@ -109,7 +106,7 @@ export default function Login() {
                 
                 {/* Image Section */}
                 <div className="hidden md:block md:w-1/2 relative bg-surface-container-low">
-                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkOQbmLa0AF_mhAK8NADejH3amLYpZJvU1NwkL_n8lwTV9qXp7GHz-BQxw0QjRgpHgl32HD6_Ty0wZb7XxN-RGKThqO6sPDiIzwRD5rrE4knJAstKzLSOubBLfXoFITJyIPSDMyALro7ijm1Amz3UgFAZ0iDL1WQafPmkbUMF8Z6pgfsPKBt7rF6utNU-_hZQalUyqzGnkd_tN4sNKQcOLMrBGfhcGWGDjZ1B0YBawUwqnSZSX8qunDoknBCpMfM5A9Ph7gZfw1Rg" alt="Hikari Premium" className="absolute inset-0 w-full h-full object-cover" />
+                    <img src="/datas/data/login_hero.png" alt="Hikari Premium" className="absolute inset-0 w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-10">
                         <h1 className="font-headline-xl text-headline-xl text-white mb-2">HIKARI</h1>
                         <p className="font-body-md text-body-md text-white/90">Premium deneyime adım atın. En yeni koleksiyonlar ve özel fırsatlar sizi bekliyor.</p>
