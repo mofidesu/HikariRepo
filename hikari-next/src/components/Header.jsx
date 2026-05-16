@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import ChatbotSidebar from './ChatbotSidebar';
 
 export default function Header({ type = 'main' }) {
     const [cartCount, setCartCount] = useState(0);
@@ -8,6 +9,40 @@ export default function Header({ type = 'main' }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [firstName, setFirstName] = useState('');
     const [isCartBumping, setIsCartBumping] = useState(false);
+    const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+
+    const [placeholderIndex, setPlaceholderIndex] = useState(0);
+    const [iconIndex, setIconIndex] = useState(0);
+    const [isFocused, setIsFocused] = useState(false);
+    const [searchValue, setSearchValue] = useState("");
+
+    const placeholders = [
+        "Plajda giyilecek kadın kombini hazırla.",
+        "Halısaha maçı için ne lazım?",
+        "Kendi tuvalimi tasarlayacağım.",
+        "Evimin bahçesi için mobilya önerileri.",
+        "Crop altına ne giysem?",
+        "Yılbaşı hediyesi fikirleri..."
+
+    ];
+
+    const icons = ["search", "lens", "scatter_plot", "more_horiz"];
+
+    useEffect(() => {
+        const textIntervalId = setInterval(() => {
+            setPlaceholderIndex(prev => (prev + 1) % placeholders.length);
+        }, 3500);
+
+        return () => clearInterval(textIntervalId);
+    }, []);
+
+    useEffect(() => {
+        const iconIntervalId = setInterval(() => {
+            setIconIndex(prev => (prev + 1) % icons.length);
+        }, 2200);
+
+        return () => clearInterval(iconIntervalId);
+    }, []);
 
     useEffect(() => {
         const updateUserData = () => {
@@ -16,12 +51,12 @@ export default function Header({ type = 'main' }) {
             if (loggedIn) {
                 const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
                 setFirstName(userData.firstName || 'Kullanıcı');
-                
+
                 let totalCartItems = 0;
                 if (userData.cart) {
                     totalCartItems = userData.cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
                 }
-                
+
                 setCartCount(prev => {
                     if (prev !== totalCartItems && totalCartItems > prev) {
                         setIsCartBumping(true);
@@ -45,16 +80,53 @@ export default function Header({ type = 'main' }) {
 
     return (
         <header className="bg-surface shadow-sm docked full-width top-0 sticky z-50">
-            <div className="flex justify-between items-center px-margin-desktop py-4 w-full max-w-container-max mx-auto">
+            <div className="flex justify-between items-center px-4 md:px-8 py-4 w-full">
                 <Link className="font-headline-lg text-headline-lg font-bold text-primary hover:opacity-80 transition-all active:scale-95 duration-200" href="/">
                     HIKARI
                 </Link>
-                
-                <div className="hidden md:flex flex-1 max-w-xl mx-8 relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary">search</span>
-                    <input className="w-full pl-10 pr-4 py-3 rounded-DEFAULT border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/10 bg-surface-container-lowest text-on-surface font-body-md text-body-md outline-none transition-all" placeholder="Ürün, marka ve daha fazlasını arayın" type="text" />
+
+                <div className="hidden md:flex flex-1 max-w-xl mx-8 relative group">
+                    <button
+                        onClick={() => setIsChatbotOpen(true)}
+                        className="absolute left-1 top-1 bottom-1 w-12 flex items-center justify-center border-r border-outline-variant/50 hover:bg-surface-container-high rounded-l-full transition-colors z-20 group-hover:border-primary/30"
+                        title="HIKARI Asistan'a Sor"
+                    >
+                        <div className="relative w-6 h-6 flex items-center justify-center">
+                            <span className={`material-symbols-outlined text-primary absolute transition-opacity duration-500 ${iconIndex % 2 === 0 ? 'opacity-100' : 'opacity-0'}`}>
+                                search
+                            </span>
+                            <span className={`material-symbols-outlined text-primary absolute transition-opacity duration-500 ${iconIndex % 2 === 1 ? 'opacity-100' : 'opacity-0'}`}>
+                                lens
+                            </span>
+                        </div>
+                    </button>
+
+                    {!isFocused && !searchValue && (
+                        <div className="absolute left-16 top-1/2 transform -translate-y-1/2 right-4 h-5 overflow-hidden pointer-events-none flex flex-col justify-start z-10">
+                            <div
+                                className="transition-transform duration-500 ease-in-out"
+                                style={{ transform: `translateY(-${placeholderIndex * 20}px)` }}
+                            >
+                                {placeholders.map((text, i) => (
+                                    <p key={i} className="text-secondary/60 text-sm truncate h-[20px] flex items-center">
+                                        {text}
+                                    </p>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <input
+                        className="w-full pl-16 pr-4 py-3 rounded-full border border-outline-variant group-hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/10 bg-surface-container-lowest text-on-surface font-body-md text-body-md outline-none transition-all"
+                        type="text"
+                        value={searchValue}
+                        onChange={(e) => setSearchValue(e.target.value)}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        placeholder={isFocused ? "Ürün, marka, fikir alışverişi..." : ""}
+                    />
                 </div>
-                
+
                 <nav className="hidden md:flex items-center space-x-8">
                     <Link className={`font-body-md text-body-md ${type === 'main' ? 'text-primary border-b-2 border-primary pb-1' : 'text-secondary hover:text-primary transition-colors'}`} href="/">
                         Yeni Gelenler
@@ -62,7 +134,7 @@ export default function Header({ type = 'main' }) {
                     <Link className={`font-body-md text-body-md ${type === 'categories' ? 'text-primary border-b-2 border-primary pb-1' : 'text-secondary hover:text-primary transition-colors'}`} href="/categories">
                         Kategoriler
                     </Link>
-                    
+
                     {/* Koleksiyonlar Dropdown */}
                     <div className="relative group py-4">
                         <Link className="font-body-md text-body-md text-secondary hover:text-primary transition-colors flex items-center gap-1" href="#">
@@ -149,9 +221,9 @@ export default function Header({ type = 'main' }) {
                         </div>
                     </div>
                 </nav>
-                
+
                 <div className="flex items-center space-x-4">
-                    <button aria-label="shopping_cart" onClick={() => window.location.href='/cart'} className="text-secondary hover:text-primary transition-colors p-2 hover:bg-surface-container-high rounded-full relative cursor-pointer">
+                    <button aria-label="shopping_cart" onClick={() => window.location.href = '/cart'} className="text-secondary hover:text-primary transition-colors p-2 hover:bg-surface-container-high rounded-full relative cursor-pointer">
                         <span className="material-symbols-outlined">shopping_cart</span>
                         {cartCount > 0 && (
                             <span className={`absolute top-0 right-0 bg-primary-container text-on-primary-container text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center transition-transform duration-300 ${isCartBumping ? 'scale-150' : 'scale-100'}`}>
@@ -159,7 +231,7 @@ export default function Header({ type = 'main' }) {
                             </span>
                         )}
                     </button>
-                    <button aria-label="favorite" onClick={() => window.location.href='/favorites'} className="text-secondary hover:text-primary transition-colors p-2 hover:bg-surface-container-high rounded-full relative cursor-pointer">
+                    <button aria-label="favorite" onClick={() => window.location.href = '/favorites'} className="text-secondary hover:text-primary transition-colors p-2 hover:bg-surface-container-high rounded-full relative cursor-pointer">
                         <span className="material-symbols-outlined">favorite</span>
                         {favCount > 0 && (
                             <span className="absolute top-0 right-0 bg-primary-container text-on-primary-container text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
@@ -167,7 +239,7 @@ export default function Header({ type = 'main' }) {
                             </span>
                         )}
                     </button>
-                    
+
                     <div className="flex items-center">
                         {isLoggedIn ? (
                             <div className="flex items-center gap-2">
@@ -187,6 +259,8 @@ export default function Header({ type = 'main' }) {
                     </div>
                 </div>
             </div>
+
+            <ChatbotSidebar isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />
         </header>
     );
 }

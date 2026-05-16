@@ -218,12 +218,14 @@ function DetailContent() {
                     <div className="mb-8 flex items-end gap-4">
                         <div className="w-24">
                             <label className="block font-label-sm text-label-sm text-on-surface mb-2" htmlFor="quantity">Adet</label>
-                            <div className="flex items-center border border-outline-variant rounded h-12">
-                                <button aria-label="Decrease quantity" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 text-secondary hover:text-primary transition-colors">
+                            <div className="flex items-center justify-between border border-outline-variant rounded h-12 w-full">
+                                <button aria-label="Decrease quantity" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 h-full flex items-center text-secondary hover:text-primary transition-colors">
                                     <span className="material-symbols-outlined text-[18px]">remove</span>
                                 </button>
-                                <input className="w-full text-center font-body-md text-on-surface border-none focus:ring-0 p-0 h-full bg-transparent appearance-none" id="quantity" min="1" type="number" value={quantity} readOnly />
-                                <button aria-label="Increase quantity" onClick={() => setQuantity(quantity + 1)} className="px-3 text-secondary hover:text-primary transition-colors">
+                                <div className="flex-1 text-center font-body-md text-on-surface flex items-center justify-center font-medium select-none" id="quantity">
+                                    {quantity}
+                                </div>
+                                <button aria-label="Increase quantity" onClick={() => setQuantity(quantity + 1)} className="px-3 h-full flex items-center text-secondary hover:text-primary transition-colors">
                                     <span className="material-symbols-outlined text-[18px]">add</span>
                                 </button>
                             </div>
