@@ -1,10 +1,12 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import ChatbotSidebar from './ChatbotSidebar';
 import MegaMenu from './MegaMenu';
 
 export default function Header({ type = 'main' }) {
+    const router = useRouter();
     const [cartCount, setCartCount] = useState(0);
     const [favCount, setFavCount] = useState(0);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -123,6 +125,11 @@ export default function Header({ type = 'main' }) {
                         type="text"
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && searchValue.trim()) {
+                                router.push(`/collection?q=${encodeURIComponent(searchValue.trim())}`);
+                            }
+                        }}
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
                         placeholder={isFocused ? "Ürün, marka, kategori arayın..." : ""}

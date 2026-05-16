@@ -1,12 +1,51 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { megaMenuData } from '@/data/categories';
+import { supabase } from '@/lib/supabase';
 
 export default function MegaMenu() {
-    const [activeTab, setActiveTab] = useState(megaMenuData[0].id);
+    const [categoriesData, setCategoriesData] = useState([]);
+    const [activeTab, setActiveTab] = useState(null);
 
-    const activeCategory = megaMenuData.find(c => c.id === activeTab);
+    useEffect(() => {
+        const fetchCategories = async () => {
+            const { data, error } = await supabase.from('categories').select('*');
+            if (data && !error) {
+                // Group by macro_category
+                const groups = {};
+                data.forEach(cat => {
+                    const macro = cat.macro_category || 'Diğer';
+                    if (!groups[macro]) groups[macro] = [];
+                    groups[macro].push(cat.category_name);
+                });
+
+                const formattedData = Object.keys(groups).map((macro, idx) => {
+                    // Split subcategories into columns of 5 items
+                    const items = groups[macro].sort();
+                    const columns = [];
+                    for (let i = 0; i < items.length; i += 5) {
+                        columns.push({
+                            title: macro,
+                            links: items.slice(i, i + 5)
+                        });
+                    }
+
+                    return {
+                        id: `cat-${idx}`,
+                        label: macro,
+                        icon: 'category', // Default icon for all macros
+                        columns: columns
+                    };
+                });
+                
+                setCategoriesData(formattedData);
+                if (formattedData.length > 0) setActiveTab(formattedData[0].id);
+            }
+        };
+        fetchCategories();
+    }, []);
+
+    const activeCategory = categoriesData.find(c => c.id === activeTab);
 
     return (
         <div className="relative group/mega h-full flex items-center">
@@ -21,8 +60,8 @@ export default function MegaMenu() {
                 <div className="flex flex-row-reverse w-full h-[550px] bg-white shadow-2xl rounded-b-xl border border-t-0 border-outline-variant/30 overflow-hidden transition-all">
                     
                     {/* Sağ Menü - Ana Kategoriler (Sağa Alındı) */}
-                    <div className="w-[240px] bg-surface-container-lowest border-l border-outline-variant/30 overflow-y-auto no-scrollbar py-2">
-                        {megaMenuData.map((category) => (
+                    <div className="w-[280px] bg-surface-container-lowest border-l border-outline-variant/30 overflow-y-auto no-scrollbar py-2">
+                        {categoriesData.map((category) => (
                             <div 
                                 key={category.id}
                                 onMouseEnter={() => setActiveTab(category.id)}
@@ -34,7 +73,7 @@ export default function MegaMenu() {
                             >
                                 <div className="flex items-center gap-3">
                                     <span className="material-symbols-outlined text-[20px]">{category.icon}</span>
-                                    <span className="text-sm">{category.label}</span>
+                                    <span className="text-sm truncate w-[180px] text-left">{category.label}</span>
                                 </div>
                                 <span className="material-symbols-outlined text-[16px] text-secondary">chevron_left</span>
                             </div>
@@ -49,27 +88,18 @@ export default function MegaMenu() {
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                                     {activeCategory.columns.map((col, idx) => (
                                         <div key={idx} className="space-y-4">
-                                            <h4 className="font-bold text-primary text-sm tracking-wide">{col.title}</h4>
                                             <ul className="space-y-2">
                                                 {col.links.map((link, linkIdx) => (
                                                     <li key={linkIdx}>
                                                         <Link 
                                                             href={`/collection?category=${encodeURIComponent(link)}`} 
-                                                            className="text-sm text-secondary hover:text-primary transition-colors hover:underline underline-offset-2"
+                                                            className="text-sm text-secondary hover:text-primary transition-colors hover:underline underline-offset-2 block truncate"
+                                                            title={link}
                                                         >
                                                             {link}
                                                         </Link>
                                                     </li>
                                                 ))}
-                                                <li>
-                                                    <Link 
-                                                        href={`/collection?category=${encodeURIComponent(col.title)}`}
-                                                        className="text-xs font-bold text-on-surface hover:text-primary transition-colors flex items-center mt-1"
-                                                    >
-                                                        Daha Fazla Gör
-                                                        <span className="material-symbols-outlined text-[14px]">expand_more</span>
-                                                    </Link>
-                                                </li>
                                             </ul>
                                         </div>
                                     ))}

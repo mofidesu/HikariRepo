@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 export default function Login() {
     const router = useRouter();
@@ -15,30 +16,81 @@ export default function Login() {
     const [regEmail, setRegEmail] = useState('');
     const [regPassword, setRegPassword] = useState('');
     const [regError, setRegError] = useState('');
+    const [regSuccess, setRegSuccess] = useState('');
 
     useEffect(() => {
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
             router.push('/');
         }
-        if (!localStorage.getItem('usersList')) {
-            localStorage.setItem('usersList', JSON.stringify([]));
-        }
     }, [router]);
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         setLoginError('');
-        const usersList = JSON.parse(localStorage.getItem('usersList')) || [];
-        const user = usersList.find(u => u.email === loginEmail && u.password === loginPassword);
 
-        if (user) {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: loginEmail,
+            password: loginPassword,
+        });
+
+        if (error) {
+            setLoginError('Şifre veya e-posta hatalı. (' + error.message + ')');
+            return;
+        }
+
+        // Fetch user profile from public.profiles
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
+
+        const userData = {
+            id: data.user.id,
+            firstName: profile?.first_name || '',
+            lastName: profile?.last_name || '',
+            email: data.user.email,
+            cart: profile?.cart || [],
+            favorites: profile?.favorites || []
+        };
+
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('userData', JSON.stringify(userData));
+        
+        window.dispatchEvent(new Event('storage'));
+        router.push('/');
+    };
+
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        setRegError('');
+        setRegSuccess('');
+
+        const { data, error } = await supabase.auth.signUp({
+            email: regEmail,
+            password: regPassword,
+            options: {
+                data: {
+                    first_name: regFirst,
+                    last_name: regLast,
+                }
+            }
+        });
+
+        if (error) {
+            setRegError(error.message);
+            return;
+        }
+
+        if (data.session) {
+            // Auto login if email confirmation is disabled
             const userData = {
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                phone: user.phone || '',
-                cart: user.cart || [],
-                favorites: user.favorites || []
+                id: data.user.id,
+                firstName: regFirst,
+                lastName: regLast,
+                email: regEmail,
+                cart: [],
+                favorites: []
             };
 
             sessionStorage.setItem('isLoggedIn', 'true');
@@ -47,49 +99,10 @@ export default function Login() {
             window.dispatchEvent(new Event('storage'));
             router.push('/');
         } else {
-            setLoginError('Şifre veya mail hatalı.');
+            // Email confirmation required
+            setRegSuccess('Kayıt başarılı! Lütfen giriş yapmadan önce e-posta adresinizi doğrulayın. (Not: Supabase panelinden e-posta doğrulamasını kapatabilirsiniz.)');
+            setTab('login');
         }
-    };
-
-    const handleRegister = (e) => {
-        e.preventDefault();
-        setRegError('');
-        const usersList = JSON.parse(localStorage.getItem('usersList')) || [];
-        const userExists = usersList.some(u => u.email === regEmail);
-
-        if (userExists) {
-            setRegError('Bu e-posta adresiyle zaten kayıt olunmuş.');
-            return;
-        }
-
-        const newUser = {
-            id: Date.now().toString(),
-            firstName: regFirst,
-            lastName: regLast,
-            email: regEmail,
-            password: regPassword,
-            phone: '',
-            cart: [],
-            favorites: []
-        };
-
-        usersList.push(newUser);
-        localStorage.setItem('usersList', JSON.stringify(usersList));
-
-        const userData = {
-            firstName: regFirst,
-            lastName: regLast,
-            email: regEmail,
-            phone: '',
-            cart: [],
-            favorites: []
-        };
-
-        sessionStorage.setItem('isLoggedIn', 'true');
-        sessionStorage.setItem('userData', JSON.stringify(userData));
-        
-        window.dispatchEvent(new Event('storage'));
-        router.push('/');
     };
 
     return (
@@ -159,6 +172,7 @@ export default function Login() {
                     {tab === 'register' && (
                         <form onSubmit={handleRegister} className="flex flex-col gap-5 transition-all duration-300 animate-in fade-in zoom-in-95 duration-200">
                             {regError && <div className="text-center text-error bg-error-container/50 border border-error-container py-3 px-4 rounded-lg font-label-md text-label-md">{regError}</div>}
+                            {regSuccess && <div className="text-center text-primary bg-primary/10 border border-primary/20 py-3 px-4 rounded-lg font-label-md text-label-md">{regSuccess}</div>}
                             <div className="flex gap-4">
                                 <div className="flex flex-col gap-1 w-1/2">
                                     <label className="font-label-sm text-label-sm text-on-surface" htmlFor="reg-firstname">İsim</label>

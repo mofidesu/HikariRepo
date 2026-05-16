@@ -3,26 +3,38 @@ import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import { productsData } from '@/data/products';
+import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
 export default function Home() {
     const [recommended, setRecommended] = useState([]);
     const [discover, setDiscover] = useState([]);
     const [discoverIndex, setDiscoverIndex] = useState(24);
+    const [localProducts, setLocalProducts] = useState([]);
     const sliderRef = useRef(null);
 
     useEffect(() => {
-        // Hydration logic, run on client
-        if (productsData && productsData.length > 0) {
-            const shuffled = [...productsData].sort(() => 0.5 - Math.random());
-            setRecommended(shuffled.slice(0, 8));
-            setDiscover(shuffled.slice(8, 24));
-        }
+        const fetchProducts = async () => {
+            const { data, error } = await supabase
+                .from('products')
+                .select('*, categories(category_name)')
+                .limit(200); // Fetch a batch for the client to shuffle
+            
+            if (data && data.length > 0) {
+                const shuffled = [...data].sort(() => 0.5 - Math.random());
+                setLocalProducts(shuffled);
+                setRecommended(shuffled.slice(0, 8));
+                setDiscover(shuffled.slice(8, 24));
+            } else if (error) {
+                console.error("Error fetching products:", error);
+            }
+        };
+        
+        fetchProducts();
     }, []);
 
     const loadMoreDiscover = () => {
-        const nextBatch = productsData.slice(discoverIndex, discoverIndex + 4);
+        const nextBatch = localProducts.slice(discoverIndex, discoverIndex + 4);
         if (nextBatch.length > 0) {
             setDiscover(prev => [...prev, ...nextBatch]);
             setDiscoverIndex(prev => prev + 4);
@@ -46,8 +58,8 @@ export default function Home() {
     };
 
     const loadAndScrollNext = () => {
-        if (productsData && productsData.length > 0) {
-            const randomProduct = productsData[Math.floor(Math.random() * productsData.length)];
+        if (localProducts && localProducts.length > 0) {
+            const randomProduct = localProducts[Math.floor(Math.random() * localProducts.length)];
             setRecommended(prev => [...prev, randomProduct]);
         }
         setTimeout(() => {

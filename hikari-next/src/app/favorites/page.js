@@ -4,12 +4,12 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import { productsData } from '@/data/products';
+import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
 export default function Favorites() {
     const router = useRouter();
-    const [favorites, setFavorites] = useState([]);
+    const [favoriteProducts, setFavoriteProducts] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
@@ -18,9 +18,22 @@ export default function Favorites() {
             return;
         }
 
-        const loadFavorites = () => {
+        const loadFavorites = async () => {
             const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
-            setFavorites(userData.favorites || []);
+            const favIds = userData.favorites || [];
+
+            if (favIds.length > 0) {
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*, categories(category_name)')
+                    .in('id', favIds);
+
+                if (data && !error) {
+                    setFavoriteProducts(data);
+                }
+            } else {
+                setFavoriteProducts([]);
+            }
         };
 
         loadFavorites();
@@ -31,8 +44,6 @@ export default function Favorites() {
     }, [router]);
 
     if (!isLoaded) return <div className="min-h-screen"></div>;
-
-    const favoriteProducts = favorites.map(favId => productsData.find(p => p.image === favId)).filter(Boolean);
 
     return (
         <div className="bg-surface text-on-surface antialiased min-h-screen flex flex-col">
@@ -51,7 +62,7 @@ export default function Favorites() {
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                         {favoriteProducts.map(product => (
-                            <ProductCard key={`fav-${product.image}`} product={product} isGrid={true} />
+                            <ProductCard key={`fav-${product.id}`} product={product} isGrid={true} />
                         ))}
                     </div>
                 )}

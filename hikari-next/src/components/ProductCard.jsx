@@ -1,14 +1,12 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { reviewsData } from '@/data/reviews';
+import { supabase } from '@/lib/supabase';
 
 const formatPrice = (price) => {
     const val = parseFloat(price) || 0;
     return new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val) + ' TL';
 };
-
-
 
 const getHeartSVG = (isFilled) => {
     if (isFilled) {
@@ -29,15 +27,17 @@ const getHeartSVG = (isFilled) => {
 export default function ProductCard({ product, isGrid = false }) {
     const router = useRouter();
     const [isFav, setIsFav] = useState(false);
-    const reviews = reviewsData.filter(r => r.productId === product.image).length;
+    
+    const reviews = product.reviews || 0;
     const price = formatPrice(product.price);
+    const categoryName = product.categories?.category_name || 'Kategori';
 
     useEffect(() => {
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
             const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
-            setIsFav(userData.favorites && userData.favorites.includes(product.image));
+            setIsFav(userData.favorites && userData.favorites.includes(product.id));
         }
-    }, [product.image]);
+    }, [product.id]);
 
     const handleToggleFavorite = (e) => {
         e.stopPropagation();
@@ -50,11 +50,11 @@ export default function ProductCard({ product, isGrid = false }) {
         const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
         if (!userData.favorites) userData.favorites = [];
 
-        const index = userData.favorites.indexOf(product.image);
+        const index = userData.favorites.indexOf(product.id);
         let newIsFav = false;
 
         if (index === -1) {
-            userData.favorites.push(product.image);
+            userData.favorites.push(product.id);
             newIsFav = true;
         } else {
             userData.favorites.splice(index, 1);
@@ -62,12 +62,14 @@ export default function ProductCard({ product, isGrid = false }) {
 
         sessionStorage.setItem('userData', JSON.stringify(userData));
         
-        // Sync to localStorage
-        const usersList = JSON.parse(localStorage.getItem('usersList')) || [];
-        const userIndex = usersList.findIndex(u => u.email === userData.email);
-        if (userIndex !== -1) {
-            usersList[userIndex].favorites = userData.favorites;
-            localStorage.setItem('usersList', JSON.stringify(usersList));
+        // Sync to Supabase
+        if (userData.id) {
+            supabase.from('profiles')
+                .update({ favorites: userData.favorites })
+                .eq('id', userData.id)
+                .then(({ error }) => {
+                    if (error) console.error("Error updating favorites:", error);
+                });
         }
         
         setIsFav(newIsFav);
@@ -85,21 +87,23 @@ export default function ProductCard({ product, isGrid = false }) {
         const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
         if (!userData.cart) userData.cart = [];
 
-        const existingItem = userData.cart.find(item => item.productId === product.image);
+        const existingItem = userData.cart.find(item => item.productId === product.id);
         if (existingItem) {
             existingItem.quantity += 1;
         } else {
-            userData.cart.push({ productId: product.image, quantity: 1 });
+            userData.cart.push({ productId: product.id, quantity: 1 });
         }
 
         sessionStorage.setItem('userData', JSON.stringify(userData));
         
-        // Sync to localStorage
-        const usersList = JSON.parse(localStorage.getItem('usersList')) || [];
-        const userIndex = usersList.findIndex(u => u.email === userData.email);
-        if (userIndex !== -1) {
-            usersList[userIndex].cart = userData.cart;
-            localStorage.setItem('usersList', JSON.stringify(usersList));
+        // Sync to Supabase
+        if (userData.id) {
+            supabase.from('profiles')
+                .update({ cart: userData.cart })
+                .eq('id', userData.id)
+                .then(({ error }) => {
+                    if (error) console.error("Error updating cart:", error);
+                });
         }
 
         window.dispatchEvent(new Event('storage'));
@@ -133,12 +137,12 @@ export default function ProductCard({ product, isGrid = false }) {
     }
 
     return (
-        <div onClick={() => router.push(`/detail?id=${encodeURIComponent(product.image)}`)}
+        <div onClick={() => router.push(`/detail?id=${encodeURIComponent(product.id)}`)}
             className={`bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer flex flex-col h-full ${cardWidthClass}`}>
             <div className="relative aspect-[4/5] bg-surface-container-low overflow-hidden">
-                <img alt={product['display name']}
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                    src={`/datas/data/${product.image}`} />
+                <img alt={product.productname}
+                    className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500 bg-white"
+                    src={product.imgUrl || 'https://via.placeholder.com/300'} />
                 <button aria-label="Add to Favorites"
                     className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full transition-colors shadow-sm cursor-pointer"
                     onClick={handleToggleFavorite}>
@@ -148,8 +152,8 @@ export default function ProductCard({ product, isGrid = false }) {
                 </button>
             </div>
             <div className="p-4 flex flex-col flex-grow">
-                <span className="font-label-sm text-label-sm text-secondary mb-1 uppercase tracking-wider truncate block">{product.category}</span>
-                <h3 className="font-body-md text-body-md text-on-surface mb-2 line-clamp-2 min-h-[3rem] font-medium">{product['display name']}</h3>
+                <span className="font-label-sm text-label-sm text-secondary mb-1 uppercase tracking-wider truncate block">{categoryName}</span>
+                <h3 className="font-body-md text-body-md text-on-surface mb-2 line-clamp-2 min-h-[3rem] font-medium">{product.productname}</h3>
                 <div className="flex items-center gap-1 mb-3">
                     {stars}
                     <span className="font-label-sm text-label-sm text-secondary ml-1">({reviews})</span>

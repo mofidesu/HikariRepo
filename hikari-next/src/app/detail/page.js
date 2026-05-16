@@ -4,9 +4,9 @@ import { useState, useEffect, Suspense, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import { productsData } from '@/data/products';
 import { reviewsData } from '@/data/reviews';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 const formatPrice = (price) => {
     const val = parseFloat(price) || 0;
@@ -40,27 +40,45 @@ function DetailContent() {
     const [quantity, setQuantity] = useState(1);
     const [isFav, setIsFav] = useState(false);
     const sliderRef = useRef(null);
-    const reviewCount = productId ? reviewsData.filter(r => r.productId === productId).length : 0;
+    const [reviewCount, setReviewCount] = useState(0);
 
     useEffect(() => {
         if (productId) {
             window.scrollTo({ top: 0, behavior: 'instant' });
-            const foundProduct = productsData.find(p => p.image === productId);
-            if (foundProduct) {
-                setProduct(foundProduct);
-                document.title = `HIKARI | ${foundProduct['display name']}`;
+            
+            const fetchProduct = async () => {
+                const { data: foundProduct } = await supabase
+                    .from('products')
+                    .select('*, categories(category_name)')
+                    .eq('id', productId)
+                    .single();
 
-                // Set initial favorite status
-                if (sessionStorage.getItem('isLoggedIn') === 'true') {
-                    const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
-                    setIsFav(userData.favorites && userData.favorites.includes(productId));
+                if (foundProduct) {
+                    setProduct(foundProduct);
+                    document.title = `HIKARI | ${foundProduct.productname}`;
+
+                    // Set initial favorite status
+                    if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                        const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
+                        setIsFav(userData.favorites && userData.favorites.includes(productId));
+                    }
+
+                    // Review count (mocking it for now)
+                    setReviewCount(Math.floor(Math.random() * 200) + 10);
+
+                    // Similar products
+                    const { data: similar } = await supabase
+                        .from('products')
+                        .select('*, categories(category_name)')
+                        .neq('id', productId)
+                        .limit(8);
+                    
+                    if (similar) {
+                        setSimilarProducts([...similar].sort(() => 0.5 - Math.random()));
+                    }
                 }
-
-                // Similar products
-                const shuffled = [...productsData].sort(() => 0.5 - Math.random());
-                const filtered = shuffled.filter(p => p.image !== productId);
-                setSimilarProducts(filtered.slice(0, 8));
-            }
+            };
+            fetchProduct();
         }
     }, [productId]);
 
@@ -85,11 +103,10 @@ function DetailContent() {
         }
 
         sessionStorage.setItem('userData', JSON.stringify(userData));
-        const usersList = JSON.parse(localStorage.getItem('usersList')) || [];
-        const userIndex = usersList.findIndex(u => u.email === userData.email);
-        if (userIndex !== -1) {
-            usersList[userIndex].favorites = userData.favorites;
-            localStorage.setItem('usersList', JSON.stringify(usersList));
+        if (userData.id) {
+            supabase.from('profiles').update({ favorites: userData.favorites }).eq('id', userData.id).then(({ error }) => {
+                if (error) console.error("Error updating favorites:", error);
+            });
         }
         setIsFav(newIsFav);
         window.dispatchEvent(new Event('storage'));
@@ -113,11 +130,10 @@ function DetailContent() {
         }
 
         sessionStorage.setItem('userData', JSON.stringify(userData));
-        const usersList = JSON.parse(localStorage.getItem('usersList')) || [];
-        const userIndex = usersList.findIndex(u => u.email === userData.email);
-        if (userIndex !== -1) {
-            usersList[userIndex].cart = userData.cart;
-            localStorage.setItem('usersList', JSON.stringify(usersList));
+        if (userData.id) {
+            supabase.from('profiles').update({ cart: userData.cart }).eq('id', userData.id).then(({ error }) => {
+                if (error) console.error("Error updating cart:", error);
+            });
         }
 
         window.dispatchEvent(new Event('storage'));
@@ -167,9 +183,9 @@ function DetailContent() {
             <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-label-sm text-secondary mb-8">
                 <Link className="hover:text-primary transition-colors" href="/">Anasayfa</Link>
                 <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-                <Link className="hover:text-primary transition-colors" href={`/collection?category=${encodeURIComponent(product.category)}`}>{product.category}</Link>
+                <Link className="hover:text-primary transition-colors" href={`/collection?category=${encodeURIComponent(product.categories?.category_name || 'Kategori')}`}>{product.categories?.category_name || 'Kategori'}</Link>
                 <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-                <span className="text-on-surface font-medium">{product['display name']}</span>
+                <span className="text-on-surface font-medium">{product.productname}</span>
             </nav>
 
             {/* Product Presentation */}
@@ -179,12 +195,12 @@ function DetailContent() {
                     <div className="flex md:flex-col gap-4 order-2 md:order-1 overflow-x-auto md:overflow-y-auto no-scrollbar shrink-0 w-full md:w-[100px]">
                         {[1, 2, 3].map((num) => (
                             <button key={num} className={`w-[80px] md:w-full aspect-[4/5] bg-surface-container-lowest border rounded-DEFAULT overflow-hidden relative shrink-0 transition-opacity ${num === 1 ? 'border-primary' : 'border-outline-variant opacity-70 hover:opacity-100'}`}>
-                                <img alt={`Thumbnail ${num}`} className="w-full h-full object-cover" src={`/datas/data/${product.image}`} />
+                                <img alt={`Thumbnail ${num}`} className="w-full h-full object-contain bg-white" src={product.imgUrl} />
                             </button>
                         ))}
                     </div>
                     <div className="flex-1 order-1 md:order-2 bg-surface-container-lowest rounded-lg overflow-hidden relative">
-                        <img alt={product['display name']} className="w-full h-full object-cover object-center" src={`/datas/data/${product.image}`} />
+                        <img alt={product.productname} className="w-full h-full object-contain object-center bg-white" src={product.imgUrl} />
                         <button className="absolute top-4 right-4 p-3 bg-surface/80 backdrop-blur-sm rounded-full text-secondary hover:text-primary hover:bg-surface shadow-sm transition-all">
                             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>zoom_in</span>
                         </button>
@@ -194,13 +210,13 @@ function DetailContent() {
                 {/* Product Info */}
                 <div className="lg:col-span-5 flex flex-col pt-4 lg:pl-8">
                     <div className="mb-6">
-                        <h2 className="font-headline-md text-headline-md font-bold text-secondary mb-2 tracking-wide uppercase">{product.category}</h2>
-                        <h1 className="font-headline-xl text-headline-xl text-on-surface mb-4">{product['display name']}</h1>
+                        <h2 className="font-headline-md text-headline-md font-bold text-secondary mb-2 tracking-wide uppercase">{product.categories?.category_name || 'Kategori'}</h2>
+                        <h1 className="font-headline-xl text-headline-xl text-on-surface mb-4">{product.productname}</h1>
                         <div className="flex items-center gap-4">
                             <div className="flex items-center text-primary-container">
                                 {stars}
                             </div>
-                            <Link href={`/reviews?id=${product.image}`} className="text-label-md text-secondary hover:text-primary underline underline-offset-4 decoration-secondary hover:decoration-primary transition-all">
+                            <Link href={`/reviews?id=${product.id}`} className="text-label-md text-secondary hover:text-primary underline underline-offset-4 decoration-secondary hover:decoration-primary transition-all">
                                 {reviewCount} Değerlendirme
                             </Link>
                         </div>
@@ -283,7 +299,7 @@ function DetailContent() {
                 </div>
                 <div ref={sliderRef} className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar pb-8">
                     {similarProducts.map(p => (
-                        <ProductCard key={`sim-${p.image}`} product={p} />
+                        <ProductCard key={`sim-${p.id}`} product={p} />
                     ))}
                 </div>
             </section>

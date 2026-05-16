@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { productsData } from '@/data/products';
+import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
 const formatPrice = (price) => {
@@ -17,6 +17,8 @@ export default function Cart() {
     const [cartItems, setCartItems] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
 
+    const [cartProducts, setCartProducts] = useState([]);
+
     useEffect(() => {
         if (sessionStorage.getItem('isLoggedIn') !== 'true') {
             router.push('/login');
@@ -24,8 +26,26 @@ export default function Cart() {
         }
 
         const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
-        setCartItems(userData.cart || []);
-        setIsLoaded(true);
+        const items = userData.cart || [];
+        setCartItems(items);
+        
+        const fetchProducts = async () => {
+            if (items.length > 0) {
+                const productIds = items.map(i => i.productId);
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*, categories(category_name)')
+                    .in('id', productIds);
+                
+                if (data && !error) {
+                    setCartProducts(data);
+                }
+            } else {
+                setCartProducts([]);
+            }
+            setIsLoaded(true);
+        };
+        fetchProducts();
     }, [router]);
 
     const updateCart = (newCart) => {
@@ -34,11 +54,12 @@ export default function Cart() {
         userData.cart = newCart;
         sessionStorage.setItem('userData', JSON.stringify(userData));
 
-        const usersList = JSON.parse(localStorage.getItem('usersList')) || [];
-        const userIndex = usersList.findIndex(u => u.email === userData.email);
-        if (userIndex !== -1) {
-            usersList[userIndex].cart = newCart;
-            localStorage.setItem('usersList', JSON.stringify(usersList));
+        sessionStorage.setItem('userData', JSON.stringify(userData));
+
+        if (userData.id) {
+            supabase.from('profiles').update({ cart: newCart }).eq('id', userData.id).then(({ error }) => {
+                if (error) console.error("Error updating cart:", error);
+            });
         }
 
         window.dispatchEvent(new Event('storage'));
@@ -68,8 +89,8 @@ export default function Cart() {
     let subtotal = 0;
     let totalItems = 0;
 
-    const cartProducts = cartItems.map(cartItem => {
-        const product = productsData.find(p => p.image === cartItem.productId);
+    const enrichedCartProducts = cartItems.map(cartItem => {
+        const product = cartProducts.find(p => p.id === cartItem.productId);
         if (!product) return null;
         
         const price = parseFloat(product.price || 0);
@@ -105,22 +126,22 @@ export default function Cart() {
                                     <h2 className="font-bold text-lg">Ürünler (<span>{totalItems}</span>)</h2>
                                 </div>
                                 <div className="divide-y divide-surface-variant">
-                                    {cartProducts.map(item => (
-                                        <div key={item.image} className="p-6 flex flex-col sm:flex-row gap-6">
+                                    {enrichedCartProducts.map(item => (
+                                        <div key={item.id} className="p-6 flex flex-col sm:flex-row gap-6">
                                             {/* Image */}
-                                            <div className="w-24 h-32 flex-shrink-0 bg-surface-container-low rounded-lg overflow-hidden cursor-pointer" onClick={() => router.push(`/detail?id=${item.image}&reviews=128`)}>
-                                                <img src={`/datas/data/${item.image}`} alt={item['display name']} className="w-full h-full object-cover" />
+                                            <div className="w-24 h-32 flex-shrink-0 bg-white rounded-lg overflow-hidden cursor-pointer flex items-center justify-center p-2" onClick={() => router.push(`/detail?id=${item.id}&reviews=128`)}>
+                                                <img src={item.imgUrl} alt={item.productname} className="w-full h-full object-contain" />
                                             </div>
                                             
                                             {/* Details */}
                                             <div className="flex-grow flex flex-col justify-between">
                                                 <div className="flex justify-between items-start gap-4">
                                                     <div>
-                                                        <span className="text-xs text-secondary mb-1 uppercase tracking-wider">{item.category}</span>
-                                                        <h3 className="font-medium text-lg text-on-surface mb-1 cursor-pointer hover:text-primary transition-colors" onClick={() => router.push(`/detail?id=${item.image}&reviews=128`)}>{item['display name']}</h3>
+                                                        <span className="text-xs text-secondary mb-1 uppercase tracking-wider">{item.categories?.category_name}</span>
+                                                        <h3 className="font-medium text-lg text-on-surface mb-1 cursor-pointer hover:text-primary transition-colors" onClick={() => router.push(`/detail?id=${item.id}&reviews=128`)}>{item.productname}</h3>
                                                         <p className="text-primary font-bold">{formatPrice(item.price)}</p>
                                                     </div>
-                                                    <button onClick={() => handleRemove(item.image)} className="text-secondary hover:text-error transition-colors p-2 bg-surface-container hover:bg-error-container/20 rounded-lg">
+                                                    <button onClick={() => handleRemove(item.id)} className="text-secondary hover:text-error transition-colors p-2 bg-surface-container hover:bg-error-container/20 rounded-lg">
                                                         <span className="material-symbols-outlined">delete</span>
                                                     </button>
                                                 </div>
@@ -128,11 +149,11 @@ export default function Cart() {
                                                 {/* Quantity & Total */}
                                                 <div className="flex justify-between items-end mt-4">
                                                     <div className="flex items-center border border-outline-variant rounded-lg h-10 overflow-hidden bg-surface-container-lowest">
-                                                        <button onClick={() => handleUpdateQuantity(item.image, item.quantity - 1)} className="px-3 h-full text-secondary hover:text-primary hover:bg-surface-container transition-colors flex items-center justify-center">
+                                                        <button onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)} className="px-3 h-full text-secondary hover:text-primary hover:bg-surface-container transition-colors flex items-center justify-center">
                                                             <span className="material-symbols-outlined text-[18px]">remove</span>
                                                         </button>
                                                         <input type="number" min="1" value={item.quantity} readOnly className="w-12 text-center font-medium text-on-surface border-none focus:ring-0 p-0 h-full bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
-                                                        <button onClick={() => handleUpdateQuantity(item.image, item.quantity + 1)} className="px-3 h-full text-secondary hover:text-primary hover:bg-surface-container transition-colors flex items-center justify-center">
+                                                        <button onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)} className="px-3 h-full text-secondary hover:text-primary hover:bg-surface-container transition-colors flex items-center justify-center">
                                                             <span className="material-symbols-outlined text-[18px]">add</span>
                                                         </button>
                                                     </div>
