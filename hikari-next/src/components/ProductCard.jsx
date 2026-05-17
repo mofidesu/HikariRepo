@@ -30,7 +30,7 @@ export default function ProductCard({ product, isGrid = false }) {
     
     const reviews = product.reviews || 0;
     const price = formatPrice(product.price);
-    const categoryName = product.categories?.category_name || 'Kategori';
+    const categoryName = product.sub_category || product.main_category || 'Kategori';
 
     useEffect(() => {
         if (sessionStorage.getItem('isLoggedIn') === 'true') {

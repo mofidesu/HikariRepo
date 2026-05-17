@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "categorize": "node categorize_products.mjs",
+    "import": "node import_products.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.4",

@@ -32,7 +32,7 @@ function CollectionContent() {
                 // Handle Search
                 const { data: searchResults, error } = await supabase
                     .from('products')
-                    .select('*, categories(category_name)')
+                    .select('*')
                     .ilike('productname', `%${searchQuery}%`)
                     .limit(40);
 
@@ -50,35 +50,45 @@ function CollectionContent() {
                 }
             } else if (categoryName) {
                 // Handle Category
-                const displayTitle = categoryName;
-
-                // 1. Get category ID
+                // First try to treat categoryName as a slug
                 const { data: catData, error: catError } = await supabase
                     .from('categories')
-                    .select('id, macro_category')
-                    .eq('category_name', categoryName)
+                    .select('id, name')
+                    .eq('slug', categoryName)
                     .single();
 
+                let catProducts = null;
+                let displayTitle = categoryName;
+
                 if (!catError && catData) {
-                    // 2. Get products for this category
-                    const { data: catProducts, error: prodError } = await supabase
+                    displayTitle = catData.name;
+                    const { data } = await supabase
                         .from('products')
-                        .select('*, categories(category_name)')
+                        .select('*')
                         .eq('category_id', catData.id)
                         .limit(40);
+                    catProducts = data;
+                } else {
+                    // Fallback to exact text match in sub_category or main_category
+                    const { data } = await supabase
+                        .from('products')
+                        .select('*')
+                        .or(`sub_category.eq."${categoryName}",main_category.eq."${categoryName}"`)
+                        .limit(40);
+                    catProducts = data;
+                }
 
-                    if (!prodError && catProducts) {
-                        setData({
-                            title: displayTitle,
-                            subtitle: catData.macro_category || 'Tüm Ürünler',
-                            description: `${displayTitle} kategorisindeki en yeni ve en şık ürünleri keşfedin.`,
-                            heroImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBzy3NWVFDFzVFj4bPDocM009pnOGgbHVNBU3GwyKLrvezXDh9p7mC6QG-h5k6hLJgJx470qH2UkYY4eNrGyGUK8YC37kiWtNbjYp8P4PYuJkIVDSHYd5b_qI8e6ump7bvZ93DmXagnF15_1zmnwXwl0RJbhkKpGGCD6yMXjW8nTXJh4D2qY0D1jde0qCxdC6AaiW-fnj7ZtmFUuhBTo6M7BS7Uop0VnCVkpMN-DOb0sojoE28zFVOqzNdWEKTggvCjvjvotI-E3TA',
-                            seller: 'HIKARI Boutique',
-                            sellerLogo: 'HB',
-                            products: catProducts
-                        });
-                        document.title = `HIKARI | ${displayTitle}`;
-                    }
+                if (catProducts && catProducts.length > 0) {
+                    setData({
+                        title: displayTitle,
+                        subtitle: 'Kategori Seçimi',
+                        description: `${displayTitle} kategorisindeki en yeni ve en şık ürünleri keşfedin.`,
+                        heroImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBzy3NWVFDFzVFj4bPDocM009pnOGgbHVNBU3GwyKLrvezXDh9p7mC6QG-h5k6hLJgJx470qH2UkYY4eNrGyGUK8YC37kiWtNbjYp8P4PYuJkIVDSHYd5b_qI8e6ump7bvZ93DmXagnF15_1zmnwXwl0RJbhkKpGGCD6yMXjW8nTXJh4D2qY0D1jde0qCxdC6AaiW-fnj7ZtmFUuhBTo6M7BS7Uop0VnCVkpMN-DOb0sojoE28zFVOqzNdWEKTggvCjvjvotI-E3TA',
+                        seller: 'HIKARI Boutique',
+                        sellerLogo: 'HB',
+                        products: catProducts
+                    });
+                    document.title = `HIKARI | ${displayTitle}`;
                 } else {
                     // Category not found or empty
                     setData(prev => ({ ...prev, title: displayTitle, products: [] }));
@@ -87,7 +97,7 @@ function CollectionContent() {
                 // Fallback (e.g., just show random products)
                 const { data: randomProducts } = await supabase
                     .from('products')
-                    .select('*, categories(category_name)')
+                    .select('*')
                     .limit(20);
 
                 if (randomProducts) {

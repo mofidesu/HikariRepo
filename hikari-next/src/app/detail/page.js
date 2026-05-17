@@ -49,7 +49,7 @@ function DetailContent() {
             const fetchProduct = async () => {
                 const { data: foundProduct } = await supabase
                     .from('products')
-                    .select('*, categories(category_name)')
+                    .select('*')
                     .eq('id', productId)
                     .single();
 
@@ -69,7 +69,7 @@ function DetailContent() {
                     // Similar products
                     const { data: similar } = await supabase
                         .from('products')
-                        .select('*, categories(category_name)')
+                        .select('*')
                         .neq('id', productId)
                         .limit(8);
                     
@@ -183,7 +183,7 @@ function DetailContent() {
             <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-label-sm text-secondary mb-8">
                 <Link className="hover:text-primary transition-colors" href="/">Anasayfa</Link>
                 <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-                <Link className="hover:text-primary transition-colors" href={`/collection?category=${encodeURIComponent(product.categories?.category_name || 'Kategori')}`}>{product.categories?.category_name || 'Kategori'}</Link>
+                <Link className="hover:text-primary transition-colors" href={`/collection?category=${encodeURIComponent(product.sub_category || product.main_category || 'Kategori')}`}>{product.sub_category || product.main_category || 'Kategori'}</Link>
                 <span className="material-symbols-outlined text-[14px]">chevron_right</span>
                 <span className="text-on-surface font-medium">{product.productname}</span>
             </nav>
@@ -210,7 +210,7 @@ function DetailContent() {
                 {/* Product Info */}
                 <div className="lg:col-span-5 flex flex-col pt-4 lg:pl-8">
                     <div className="mb-6">
-                        <h2 className="font-headline-md text-headline-md font-bold text-secondary mb-2 tracking-wide uppercase">{product.categories?.category_name || 'Kategori'}</h2>
+                        <h2 className="font-headline-md text-headline-md font-bold text-secondary mb-2 tracking-wide uppercase">{product.sub_category || product.main_category || 'Kategori'}</h2>
                         <h1 className="font-headline-xl text-headline-xl text-on-surface mb-4">{product.productname}</h1>
                         <div className="flex items-center gap-4">
                             <div className="flex items-center text-primary-container">

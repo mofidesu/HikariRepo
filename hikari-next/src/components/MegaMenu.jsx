@@ -11,17 +11,19 @@ export default function MegaMenu() {
         const fetchCategories = async () => {
             const { data, error } = await supabase.from('categories').select('*');
             if (data && !error) {
-                // Group by macro_category
+                // Group hierarchical categories
                 const groups = {};
-                data.forEach(cat => {
-                    const macro = cat.macro_category || 'Diğer';
-                    if (!groups[macro]) groups[macro] = [];
-                    groups[macro].push(cat.category_name);
+                const macroCategories = data.filter(c => c.parent_id === null);
+                const subCategories = data.filter(c => c.parent_id !== null);
+
+                macroCategories.forEach(macro => {
+                    const subs = subCategories.filter(sub => sub.parent_id == macro.id).map(sub => ({ name: sub.name, slug: sub.slug }));
+                    groups[macro.name] = subs.length > 0 ? subs : [{ name: 'Tümü', slug: macro.slug }];
                 });
 
                 const formattedData = Object.keys(groups).map((macro, idx) => {
                     // Split subcategories into columns of 5 items
-                    const items = groups[macro].sort();
+                    const items = groups[macro].sort((a, b) => a.name.localeCompare(b.name));
                     const columns = [];
                     for (let i = 0; i < items.length; i += 5) {
                         columns.push({
@@ -92,11 +94,11 @@ export default function MegaMenu() {
                                                 {col.links.map((link, linkIdx) => (
                                                     <li key={linkIdx}>
                                                         <Link 
-                                                            href={`/collection?category=${encodeURIComponent(link)}`} 
+                                                            href={`/collection?category=${encodeURIComponent(link.slug)}`} 
                                                             className="text-sm text-secondary hover:text-primary transition-colors hover:underline underline-offset-2 block truncate"
-                                                            title={link}
+                                                            title={link.name}
                                                         >
-                                                            {link}
+                                                            {link.name}
                                                         </Link>
                                                     </li>
                                                 ))}

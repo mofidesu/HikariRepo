@@ -34,7 +34,7 @@ export default function Cart() {
                 const productIds = items.map(i => i.productId);
                 const { data, error } = await supabase
                     .from('products')
-                    .select('*, categories(category_name)')
+                    .select('*')
                     .in('id', productIds);
                 
                 if (data && !error) {
@@ -137,7 +137,7 @@ export default function Cart() {
                                             <div className="flex-grow flex flex-col justify-between">
                                                 <div className="flex justify-between items-start gap-4">
                                                     <div>
-                                                        <span className="text-xs text-secondary mb-1 uppercase tracking-wider">{item.categories?.category_name}</span>
+                                                        <span className="text-xs text-secondary mb-1 uppercase tracking-wider">{item.sub_category || item.main_category || 'Kategori'}</span>
                                                         <h3 className="font-medium text-lg text-on-surface mb-1 cursor-pointer hover:text-primary transition-colors" onClick={() => router.push(`/detail?id=${item.id}&reviews=128`)}>{item.productname}</h3>
                                                         <p className="text-primary font-bold">{formatPrice(item.price)}</p>
                                                     </div>

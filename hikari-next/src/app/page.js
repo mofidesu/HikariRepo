@@ -17,7 +17,7 @@ export default function Home() {
         const fetchProducts = async () => {
             const { data, error } = await supabase
                 .from('products')
-                .select('*, categories(category_name)')
+                .select('*')
                 .limit(200); // Fetch a batch for the client to shuffle
             
             if (data && data.length > 0) {

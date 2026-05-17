@@ -25,7 +25,7 @@ export default function Favorites() {
             if (favIds.length > 0) {
                 const { data, error } = await supabase
                     .from('products')
-                    .select('*, categories(category_name)')
+                    .select('*')
                     .in('id', favIds);
 
                 if (data && !error) {
