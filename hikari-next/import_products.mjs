@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 import path from 'path';
 import Papa from 'papaparse';
+import { mapCategory } from './category_mapper.mjs';
 
 // 1. Çevresel değişkenleri (Environment Variables) yükle
 const envFile = fs.readFileSync('.env.local', 'utf8');
@@ -22,22 +23,22 @@ async function importProducts() {
     }
 
     // Kategori eşleştirme haritası (Map) oluştur
-    const mainCatMap = {};
-    const subCatMap = {};
+    const catMap = {};
 
     categories.forEach(c => {
-        if (c.parent_id === null) {
-            mainCatMap[c.name.toLowerCase().trim()] = c.id;
-        }
-    });
-
-    categories.forEach(c => {
-        if (c.parent_id !== null) {
-            subCatMap[`${c.parent_id}-${c.name.toLowerCase().trim()}`] = c.id;
-        }
+        const key = `${(c.main_category || '').toLowerCase().trim()}-${(c.sub_category || '').toLowerCase().trim()}`;
+        catMap[key] = c.id;
     });
 
     console.log(`Veritabanından ${categories.length} adet kategori hafızaya alındı.`);
+
+    console.log('Mevcut ürünler siliniyor (Temiz başlangıç)...');
+    // UUID formatı beklendiği için id != 0 yerine id is not null kullanıyoruz
+    const { error: delError } = await supabase.from('products').delete().not('id', 'is', null);
+    if (delError) {
+        console.error('Ürünleri silerken hata oluştu:', delError);
+        return;
+    }
 
     console.log('products.csv dosyası okunuyor...');
     const productsFile = path.join('..', 'products.csv');
@@ -63,20 +64,16 @@ async function importProducts() {
     let successCount = 0;
     let failCount = 0;
 
-    // Supabase tek seferde maksimum ~1000 satır (hatta daha az) insert önerebiliyor, 
-    // Yüksek veri miktarı nedeniyle 1000'lik paketler (batch) halinde yükleyeceğiz.
     const batchSize = 1000;
     
     for (let i = 0; i < productsData.length; i += batchSize) {
         let batchRows = productsData.slice(i, i + batchSize);
         
         let batch = batchRows.map(row => {
-            // Fiyat bilgisini sayıya çevir: "359,40 TL" -> 359.40
             let priceStr = (row['Fiyat'] || '0').replace(/TL/gi, '').replace(/\./g, '').replace(/,/g, '.').trim();
             let priceNum = parseFloat(priceStr);
             if (isNaN(priceNum)) priceNum = 0;
 
-            // Yıldız ve Yorum Sayısı hesaplaması
             let starsStr = (row['Yıldız'] || '0').replace(/,/g, '.');
             let starsNum = parseFloat(starsStr);
             if (isNaN(starsNum)) starsNum = 0;
@@ -85,18 +82,13 @@ async function importProducts() {
             let reviewsNum = parseInt(reviewsStr, 10);
             if (isNaN(reviewsNum)) reviewsNum = 0;
 
-            // Kategori ID'sini tespit et
-            const mainCatName = (row['Ana Kategori'] || '').toLowerCase().trim();
-            const subCatName = (row['Alt Kategori'] || '').toLowerCase().trim();
+            // Kategori eşleştirmesi yapılıyor
+            const { mappedMain, mappedSub } = mapCategory(row['Ana Kategori'], row['Alt Kategori']);
             
             let categoryId = null;
-            if (mainCatName && mainCatMap[mainCatName]) {
-                const mainId = mainCatMap[mainCatName];
-                if (subCatName && subCatMap[`${mainId}-${subCatName}`]) {
-                    categoryId = subCatMap[`${mainId}-${subCatName}`];
-                } else {
-                    categoryId = mainId; // Eğer alt kategori bulunamazsa ana kategoriye bağla
-                }
+            if (mappedMain && mappedSub) {
+                const key = `${mappedMain.toLowerCase()}-${mappedSub.toLowerCase()}`;
+                categoryId = catMap[key] || null;
             }
 
             return {
@@ -107,8 +99,8 @@ async function importProducts() {
                 stars: starsNum,
                 reviews: reviewsNum,
                 social_proof: row['Sosyal Kanıt (Favori)'] || '',
-                main_category: row['Ana Kategori'] || '',
-                sub_category: row['Alt Kategori'] || '',
+                main_category: mappedMain,
+                sub_category: mappedSub,
                 category_id: categoryId
             };
         });

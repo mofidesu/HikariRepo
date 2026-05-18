@@ -11,14 +11,19 @@ export default function MegaMenu() {
         const fetchCategories = async () => {
             const { data, error } = await supabase.from('categories').select('*');
             if (data && !error) {
-                // Group hierarchical categories
+                // Group flat categories using new schema
                 const groups = {};
-                const macroCategories = data.filter(c => c.parent_id === null);
-                const subCategories = data.filter(c => c.parent_id !== null);
 
-                macroCategories.forEach(macro => {
-                    const subs = subCategories.filter(sub => sub.parent_id == macro.id).map(sub => ({ name: sub.name, slug: sub.slug }));
-                    groups[macro.name] = subs.length > 0 ? subs : [{ name: 'Tümü', slug: macro.slug }];
+                data.forEach(c => {
+                    const macroName = c.main_category;
+                    const subName = c.sub_category;
+                    
+                    if (!groups[macroName]) {
+                        groups[macroName] = [];
+                    }
+                    if (subName) {
+                        groups[macroName].push({ name: subName, slug: c.slug });
+                    }
                 });
 
                 const formattedData = Object.keys(groups).map((macro, idx) => {
