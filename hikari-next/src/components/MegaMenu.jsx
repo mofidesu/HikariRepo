@@ -69,7 +69,8 @@ export default function MegaMenu() {
                     {/* Sağ Menü - Ana Kategoriler (Sağa Alındı) */}
                     <div className="w-[280px] bg-surface-container-lowest border-l border-outline-variant/30 overflow-y-auto no-scrollbar py-2">
                         {categoriesData.map((category) => (
-                            <div 
+                            <Link 
+                                href={`/collection?category=${encodeURIComponent(category.label)}`}
                                 key={category.id}
                                 onMouseEnter={() => setActiveTab(category.id)}
                                 className={`flex justify-between items-center px-6 py-3 cursor-pointer transition-colors ${
@@ -83,7 +84,7 @@ export default function MegaMenu() {
                                     <span className="text-sm truncate w-[180px] text-left">{category.label}</span>
                                 </div>
                                 <span className="material-symbols-outlined text-[16px] text-secondary">chevron_left</span>
-                            </div>
+                            </Link>
                         ))}
                     </div>
 
@@ -91,7 +92,11 @@ export default function MegaMenu() {
                     <div className="flex-1 bg-white p-8 overflow-y-auto no-scrollbar">
                         {activeCategory && (
                             <div>
-                                <h3 className="font-headline-sm font-bold text-on-surface mb-6 border-b border-outline-variant/20 pb-2">{activeCategory.label}</h3>
+                                <Link href={`/collection?category=${encodeURIComponent(activeCategory.label)}`}>
+                                    <h3 className="font-headline-sm font-bold text-on-surface mb-6 border-b border-outline-variant/20 pb-2 hover:text-primary transition-colors inline-block w-full">
+                                        {activeCategory.label} <span className="text-sm font-normal text-secondary ml-2">(Tümünü Gör)</span>
+                                    </h3>
+                                </Link>
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                                     {activeCategory.columns.map((col, idx) => (
                                         <div key={idx} className="space-y-4">

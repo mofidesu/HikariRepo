@@ -16,7 +16,7 @@ export default function Home() {
     useEffect(() => {
         const fetchProducts = async () => {
             const { data, error } = await supabase
-                .from('products')
+                .from('random_products')
                 .select('*')
                 .limit(200); // Fetch a batch for the client to shuffle
             

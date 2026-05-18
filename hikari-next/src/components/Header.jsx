@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ChatbotSidebar from './ChatbotSidebar';
 import MegaMenu from './MegaMenu';
+import { supabase } from '@/lib/supabase';
 
 export default function Header({ type = 'main' }) {
     const router = useRouter();
@@ -18,6 +19,7 @@ export default function Header({ type = 'main' }) {
     const [iconIndex, setIconIndex] = useState(0);
     const [isFocused, setIsFocused] = useState(false);
     const [searchValue, setSearchValue] = useState("");
+    const [suggestions, setSuggestions] = useState([]);
 
     const placeholders = [
         "Plajda giyilecek kadın kombini hazırla.",
@@ -45,6 +47,23 @@ export default function Header({ type = 'main' }) {
 
         return () => clearInterval(iconIntervalId);
     }, []);
+
+    useEffect(() => {
+        const fetchSuggestions = async () => {
+            if (searchValue.trim().length < 2) {
+                setSuggestions([]);
+                return;
+            }
+            const { data } = await supabase
+                .from('products')
+                .select('id, productname, imgUrl, price')
+                .ilike('productname', `%${searchValue.trim()}%`)
+                .limit(4);
+            if (data) setSuggestions(data);
+        };
+        const timeoutId = setTimeout(() => fetchSuggestions(), 300); // debounce
+        return () => clearTimeout(timeoutId);
+    }, [searchValue]);
 
     useEffect(() => {
         const updateUserData = () => {
@@ -128,12 +147,40 @@ export default function Header({ type = 'main' }) {
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && searchValue.trim()) {
                                 router.push(`/collection?q=${encodeURIComponent(searchValue.trim())}`);
+                                setIsFocused(false);
                             }
                         }}
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
                         placeholder={isFocused ? "Ürün, marka, kategori arayın..." : ""}
                     />
+
+                    {/* Search Suggestions Dropdown */}
+                    {isFocused && suggestions.length > 0 && (
+                        <div className="absolute top-[110%] left-0 right-0 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg z-50 overflow-hidden">
+                            {suggestions.map((item) => (
+                                <div 
+                                    key={item.id}
+                                    onMouseDown={(e) => {
+                                        // use onMouseDown to prevent onBlur firing before click
+                                        e.preventDefault();
+                                        router.push(`/detail?id=${item.id}`);
+                                        setIsFocused(false);
+                                        setSearchValue("");
+                                    }}
+                                    className="flex items-center gap-3 p-3 hover:bg-surface-container-low cursor-pointer transition-colors border-b border-outline-variant/30 last:border-0"
+                                >
+                                    <div className="w-10 h-10 shrink-0 bg-white border border-outline-variant/50 rounded overflow-hidden flex items-center justify-center p-1">
+                                        <img src={item.imgUrl} alt={item.productname} className="max-w-full max-h-full object-contain" />
+                                    </div>
+                                    <div className="flex flex-col flex-1 min-w-0">
+                                        <span className="text-sm font-medium text-on-surface truncate">{item.productname}</span>
+                                        <span className="text-xs text-primary font-bold">{new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2 }).format(item.price)} TL</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Sağ Taraf Kompleksi */}
@@ -196,6 +243,22 @@ export default function Header({ type = 'main' }) {
             </div>
 
             <ChatbotSidebar isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />
+
+            {/* Global Floating Chatbot Button (Left Edge) */}
+            {!isChatbotOpen && (
+                <button
+                    onClick={() => setIsChatbotOpen(true)}
+                    className="fixed left-0 top-1/2 -translate-y-1/2 z-40 bg-surface-container-lowest shadow-md hover:shadow-lg transition-all pl-2 pr-2 py-6 rounded-r-2xl border border-l-0 border-outline-variant/30 flex flex-col items-center justify-center group hover:pl-3"
+                    title="Hikai'yi Aç"
+                >
+                    <span className="material-symbols-outlined text-primary mb-1 text-[20px] group-hover:scale-110 transition-transform">
+                        auto_awesome
+                    </span>
+                    <span className="material-symbols-outlined text-secondary text-[24px] group-hover:text-primary transition-colors">
+                        chevron_right
+                    </span>
+                </button>
+            )}
         </header>
     );
 }

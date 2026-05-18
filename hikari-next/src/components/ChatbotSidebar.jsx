@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 export default function ChatbotSidebar({ isOpen, onClose }) {
     const [messages, setMessages] = useState([
-        { id: 1, text: "Merhaba! Ben HIKARI AI. Sana özel stil önerileri sunmak, hediye seçmek veya koleksiyonlarımız hakkında bilgi vermek için buradayım.", sender: "bot" }
+        { id: 1, text: "Merhaba! Ben Hikai. Sana özel stil önerileri sunmak, hediye seçmek veya koleksiyonlarımız hakkında bilgi vermek için buradayım.", sender: "bot" }
     ]);
     const [inputValue, setInputValue] = useState("");
 
@@ -52,7 +52,7 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
                             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-surface rounded-full"></div>
                         </div>
                         <div>
-                            <h2 className="font-headline-md font-extrabold text-on-surface tracking-tight">HIKARI <span className="text-primary">AI</span></h2>
+                            <h2 className="font-headline-md font-extrabold text-on-surface tracking-tight">Hikai</h2>
                             <p className="text-sm text-secondary font-medium flex items-center gap-1">
                                 <span className="material-symbols-outlined text-[14px]">bolt</span>
                                 Stil Asistanınız Çevrimiçi
@@ -121,7 +121,7 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
                             type="text"
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
-                            placeholder="Hikari AI ile konuşun..."
+                            placeholder="Hikai ile konuşun..."
                             className="w-full pl-16 pr-16 py-5 rounded-full border border-outline-variant/50 bg-white shadow-sm focus:shadow-md focus:border-primary focus:ring-4 focus:ring-primary/10 text-on-surface font-body-md outline-none transition-all"
                         />
                         <button 
@@ -136,7 +136,7 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
                             <span className="material-symbols-outlined text-[20px] ml-1">send</span>
                         </button>
                     </form>
-                    <p className="text-center text-[10px] text-secondary mt-4 font-medium">HIKARI AI yanlışlıklar yapabilir. Lütfen önemli bilgileri doğrulayın.</p>
+                    <p className="text-center text-[10px] text-secondary mt-4 font-medium">Hikai yanlışlıklar yapabilir. Lütfen önemli bilgileri doğrulayın.</p>
                 </div>
             </div>
         </>

@@ -180,12 +180,31 @@ function DetailContent() {
     return (
         <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 md:py-12">
             {/* Breadcrumbs */}
-            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-label-sm text-secondary mb-8">
-                <Link className="hover:text-primary transition-colors" href="/">Anasayfa</Link>
-                <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-                <Link className="hover:text-primary transition-colors" href={`/collection?category=${encodeURIComponent(product.sub_category || product.main_category || 'Kategori')}`}>{product.sub_category || product.main_category || 'Kategori'}</Link>
-                <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-                <span className="text-on-surface font-medium">{product.productname}</span>
+            <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-label-sm text-secondary mb-8">
+                <Link className="hover:text-primary transition-colors whitespace-nowrap" href="/">Anasayfa</Link>
+                
+                {product.main_category && (
+                    <>
+                        <span className="material-symbols-outlined text-[14px] shrink-0">chevron_right</span>
+                        <Link className="hover:text-primary transition-colors whitespace-nowrap" href={`/collection?category=${encodeURIComponent(product.main_category)}`}>
+                            {product.main_category}
+                        </Link>
+                    </>
+                )}
+
+                {product.sub_category && product.sub_category !== product.main_category && (
+                    <>
+                        <span className="material-symbols-outlined text-[14px] shrink-0">chevron_right</span>
+                        <Link className="hover:text-primary transition-colors whitespace-nowrap" href={`/collection?category=${encodeURIComponent(product.sub_category)}`}>
+                            {product.sub_category}
+                        </Link>
+                    </>
+                )}
+                
+                <span className="material-symbols-outlined text-[14px] shrink-0">chevron_right</span>
+                <span className="text-on-surface font-medium truncate max-w-[200px] md:max-w-md" title={product.productname}>
+                    {product.productname}
+                </span>
             </nav>
 
             {/* Product Presentation */}
