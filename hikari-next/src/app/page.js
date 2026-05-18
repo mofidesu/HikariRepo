@@ -3,9 +3,9 @@ import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
+// HIKARI E-Ticaret platformunun ana karşılama (Landing) sayfası.
 export default function Home() {
     const [recommended, setRecommended] = useState([]);
     const [discover, setDiscover] = useState([]);
@@ -13,26 +13,27 @@ export default function Home() {
     const [localProducts, setLocalProducts] = useState([]);
     const sliderRef = useRef(null);
 
+    // Sayfa yüklendiğinde yerel products.json kataloğunu çeker, karıştırır (shuffled) ve anasayfa vitrinlerine dağıtır.
     useEffect(() => {
         const fetchProducts = async () => {
-            const { data, error } = await supabase
-                .from('random_products')
-                .select('*')
-                .limit(200); // Fetch a batch for the client to shuffle
-            
-            if (data && data.length > 0) {
-                const shuffled = [...data].sort(() => 0.5 - Math.random());
-                setLocalProducts(shuffled);
-                setRecommended(shuffled.slice(0, 8));
-                setDiscover(shuffled.slice(8, 24));
-            } else if (error) {
-                console.error("Error fetching products:", error);
+            try {
+                const res = await fetch('/products.json');
+                const data = await res.json();
+                if (data && data.length > 0) {
+                    const shuffled = [...data].sort(() => 0.5 - Math.random());
+                    setLocalProducts(shuffled);
+                    setRecommended(shuffled.slice(0, 8));
+                    setDiscover(shuffled.slice(8, 24));
+                }
+            } catch (error) {
+                console.error("Error fetching local products:", error);
             }
         };
         
         fetchProducts();
     }, []);
 
+    // "Daha Fazla Keşfet" butonu tıklandığında listeden sıradaki 4 ürünü yükleyen fonksiyon.
     const loadMoreDiscover = () => {
         const nextBatch = localProducts.slice(discoverIndex, discoverIndex + 4);
         if (nextBatch.length > 0) {
@@ -41,6 +42,7 @@ export default function Home() {
         }
     };
 
+    // Sayfa içi yumuşak geçişli (smooth scroll) kaydırma sağlayan yardımcı fonksiyon.
     const scrollToSection = (id) => {
         const el = document.getElementById(id);
         if (el) {
@@ -48,6 +50,7 @@ export default function Home() {
         }
     };
 
+    // Yatay slider alanını butonlarla sağa/sola kaydıran fonksiyon.
     const scrollSlider = (direction) => {
         if (sliderRef.current && sliderRef.current.firstElementChild) {
             const itemWidth = sliderRef.current.firstElementChild.offsetWidth;
@@ -57,6 +60,7 @@ export default function Home() {
         }
     };
 
+    // Önerilen ürünler slider'ında sonsuz kaydırma hissi yaratmak için dinamik ürün yükleyen ve kaydıran fonksiyon.
     const loadAndScrollNext = () => {
         if (localProducts && localProducts.length > 0) {
             const randomProduct = localProducts[Math.floor(Math.random() * localProducts.length)];
@@ -78,7 +82,7 @@ export default function Home() {
             
             <main className="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 flex flex-col gap-12">
                 
-                {/* Unified Bento Showcase Dashboard */}
+                {/* Birleştirilmiş Bento Vitrini Paneli (Kahraman Afiş, Önerilen Kategoriler ve Kampanyalar) */}
                 <div className="bg-surface-container rounded-3xl p-6 md:p-10 shadow-sm border border-outline-variant/10 flex flex-col gap-12">
                     {/* Part 1: Hero Grid */}
                     <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">

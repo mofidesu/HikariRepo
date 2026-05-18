@@ -1,28 +1,32 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 
+// Google Inter yazı tipini (font) projenin CSS değişkenlerine bağlayarak yapılandırıyoruz.
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   weight: ['400', '500', '600', '700'],
 });
 
+// Sitenin arama motorlarında (SEO) ve tarayıcı sekmelerinde görünecek varsayılan başlık ve açıklamaları.
 export const metadata = {
   title: "HIKARI | E-Ticaret'in Yeni Yansıması",
   description: "HIKARI Premium E-ticaret platformu",
 };
 
+// Uygulamanın tüm sayfalarını kapsayan ve ortak şablonu (yazı tipi, ikon kütüphanesi, küresel arka planlar) oluşturan kök düzen (Root Layout).
 export default function RootLayout({ children }) {
   return (
     <html lang="tr" className={`${inter.variable} antialiased h-full`}>
       <head>
+        {/* Google Material Tasarım İkon Kütüphanesi bağlantısı */}
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0"
           rel="stylesheet"
         />
       </head>
       <body className="bg-background text-on-background min-h-screen flex flex-col font-body-lg relative overflow-x-hidden">
-        {/* Global Background Elements */}
+        {/* Sayfa arkasında estetik derinlik yaratan renkli küresel flu (blur) arka plan daireleri */}
         <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-fixed/30 rounded-full blur-3xl z-[-1] pointer-events-none"></div>
         <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-tertiary-fixed/30 rounded-full blur-3xl z-[-1] pointer-events-none"></div>
         

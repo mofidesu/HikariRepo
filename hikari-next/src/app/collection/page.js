@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { supabase } from '@/lib/supabase';
 
+// Arama sorguları veya kategori filtrelerine göre ürün listeleme sayfasının ana içeriği.
 function CollectionContent() {
     const searchParams = useSearchParams();
     const categoryName = searchParams.get('category');
@@ -29,6 +30,7 @@ function CollectionContent() {
     const [hasMore, setHasMore] = useState(true);
     const [sortBy, setSortBy] = useState('recommended');
 
+    // Aktif filtrelere göre veritabanından çekilebilecek toplam ürün sayısını bulan sorgu fonksiyonu.
     const fetchTotalCount = async (config) => {
         let count = 0;
         if (config.type === 'search') {
@@ -47,6 +49,7 @@ function CollectionContent() {
         setTotalCount(count);
     };
 
+    // Sıralama (Sort) ve filtre ayarları (Search, Category) uyarınca özelleştirilmiş Supabase sorgusu üretir.
     const getProductsQuery = (config, sortMethod) => {
         let q = supabase.from(sortMethod === 'recommended' ? 'random_products' : 'products').select('*').limit(40);
         
@@ -61,6 +64,7 @@ function CollectionContent() {
         return q;
     };
 
+    // URL parametreleri (Arama kelimesi veya Kategori) ve Sıralama değiştiğinde veriyi baştan yükleyen ana kanca.
     useEffect(() => {
         const fetchInitial = async () => {
             setIsLoading(true);
@@ -106,6 +110,7 @@ function CollectionContent() {
         fetchInitial();
     }, [categoryName, searchQuery, sortBy]);
 
+    // Sayfa aşağı kaydırıldıkça (Infinite Scroll) yeni ürünleri arka planda yükleyen fonksiyon.
     const loadMore = async () => {
         if (isLoadingMore || !hasMore || !queryConfig) return;
         setIsLoadingMore(true);
@@ -113,7 +118,6 @@ function CollectionContent() {
         
         if (newProducts && newProducts.length > 0) {
             setData(prev => {
-                // Filtreleme ile dublikeleri önlüyoruz
                 const existingIds = new Set(prev.products.map(p => p.id));
                 const filtered = newProducts.filter(p => !existingIds.has(p.id));
                 if (prev.products.length + filtered.length >= totalCount || filtered.length === 0) {
@@ -129,6 +133,7 @@ function CollectionContent() {
 
     const observerRef = useRef(null);
 
+    // Kesişim Gözlemcisi (Intersection Observer) ile sayfa sonundaki sentinel div'i takip edip sonsuz kaydırmayı tetikler.
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !isLoading && !isLoadingMore && hasMore) {

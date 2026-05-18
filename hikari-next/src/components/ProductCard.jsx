@@ -3,11 +3,13 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
+// Ürün fiyatlarını Türkiye para birimi formatına (TL) dönüştüren yardımcı fonksiyon.
 const formatPrice = (price) => {
     const val = parseFloat(price) || 0;
     return new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val) + ' TL';
 };
 
+// Favori butonunun aktif/pasif durumuna göre içi dolu veya boş kalp ikonu üreten SVG fonksiyonu.
 const getHeartSVG = (isFilled) => {
     if (isFilled) {
         return (
@@ -24,6 +26,7 @@ const getHeartSVG = (isFilled) => {
     }
 };
 
+// Tekil bir ürünün kart olarak ekranda listelenmesini sağlayan ana bileşen.
 export default function ProductCard({ product, isGrid = false }) {
     const router = useRouter();
     const [isFav, setIsFav] = useState(false);
@@ -32,6 +35,7 @@ export default function ProductCard({ product, isGrid = false }) {
     const price = formatPrice(product.price);
     const categoryName = product.sub_category || product.main_category || 'Kategori';
 
+    // Bileşen yüklendiğinde kullanıcının oturum verisini tarayıp bu ürünün favorilerde olup olmadığını kontrol eder.
     useEffect(() => {
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
             const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
@@ -39,6 +43,7 @@ export default function ProductCard({ product, isGrid = false }) {
         }
     }, [product.id]);
 
+    // Ürünü favorilere ekleme/çıkarma işlemini yöneten ve Supabase veritabanıyla senkronize eden buton tetikleyicisi.
     const handleToggleFavorite = (e) => {
         e.stopPropagation();
         if (sessionStorage.getItem('isLoggedIn') !== 'true') {
@@ -62,7 +67,7 @@ export default function ProductCard({ product, isGrid = false }) {
 
         sessionStorage.setItem('userData', JSON.stringify(userData));
         
-        // Sync to Supabase
+        // Supabase profilinde favorileri güncelliyoruz.
         if (userData.id) {
             supabase.from('profiles')
                 .update({ favorites: userData.favorites })
@@ -76,6 +81,7 @@ export default function ProductCard({ product, isGrid = false }) {
         window.dispatchEvent(new Event('storage'));
     };
 
+    // Ürünü sepete ekleme işlemini yöneten ve Supabase sepet verisini güncelleyen fonksiyon.
     const handleAddToCart = (e) => {
         e.stopPropagation();
         if (sessionStorage.getItem('isLoggedIn') !== 'true') {
@@ -96,7 +102,7 @@ export default function ProductCard({ product, isGrid = false }) {
 
         sessionStorage.setItem('userData', JSON.stringify(userData));
         
-        // Sync to Supabase
+        // Supabase profilinde sepeti güncelliyoruz.
         if (userData.id) {
             supabase.from('profiles')
                 .update({ cart: userData.cart })
@@ -111,7 +117,7 @@ export default function ProductCard({ product, isGrid = false }) {
 
     const cardWidthClass = isGrid ? 'w-full' : 'w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-start';
 
-    // Stars
+    // Ürünün puanına göre (1-5 arası) doldurulmuş, yarım veya boş yıldızlar üreten SVG döngüsü.
     const rating = parseFloat(product.stars) || 5;
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -139,6 +145,8 @@ export default function ProductCard({ product, isGrid = false }) {
     return (
         <div onClick={() => router.push(`/detail?id=${encodeURIComponent(product.id)}`)}
             className={`bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer flex flex-col h-full ${cardWidthClass}`}>
+            
+            {/* Ürün Görseli ve Favori Kalp Butonu */}
             <div className="relative aspect-[4/5] bg-surface-container-low overflow-hidden">
                 <img alt={product.productname}
                     className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500 bg-white"
@@ -151,6 +159,8 @@ export default function ProductCard({ product, isGrid = false }) {
                     </span>
                 </button>
             </div>
+            
+            {/* Ürün Bilgileri (Kategori, İsim, Puan, Fiyat ve Sepete Ekle Butonu) */}
             <div className="p-4 flex flex-col flex-grow">
                 <span className="font-label-sm text-label-sm text-secondary mb-1 uppercase tracking-wider truncate block">{categoryName}</span>
                 <h3 className="font-body-md text-body-md text-on-surface mb-2 line-clamp-2 min-h-[3rem] font-medium">{product.productname}</h3>

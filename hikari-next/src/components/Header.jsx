@@ -6,6 +6,7 @@ import ChatbotSidebar from './ChatbotSidebar';
 import MegaMenu from './MegaMenu';
 import { supabase } from '@/lib/supabase';
 
+// HIKARI platformunun genel üst bilgi (Header) bileşeni. Arama çubuğu, sepet/favori sayaçları ve Hikai Asistan tetikleyicisini barındırır.
 export default function Header({ type = 'main' }) {
     const router = useRouter();
     const [cartCount, setCartCount] = useState(0);
@@ -21,6 +22,7 @@ export default function Header({ type = 'main' }) {
     const [searchValue, setSearchValue] = useState("");
     const [suggestions, setSuggestions] = useState([]);
 
+    // Hikai Asistanı için arama çubuğunda dönen ilham verici sorular listesi.
     const placeholders = [
         "Plajda giyilecek kadın kombini hazırla.",
         "Halısaha maçı için ne lazım?",
@@ -32,6 +34,7 @@ export default function Header({ type = 'main' }) {
 
     const icons = ["search", "lens", "scatter_plot", "more_horiz"];
 
+    // Arama çubuğundaki yapay zeka sorularını belirli zaman aralığıyla (dikey kayarak) döndürür.
     useEffect(() => {
         const textIntervalId = setInterval(() => {
             setPlaceholderIndex(prev => (prev + 1) % placeholders.length);
@@ -40,6 +43,7 @@ export default function Header({ type = 'main' }) {
         return () => clearInterval(textIntervalId);
     }, []);
 
+    // Arama büyüteci ile Hikai logosunun dönüşümlü geçiş efektini kontrol eden zamanlayıcı.
     useEffect(() => {
         const iconIntervalId = setInterval(() => {
             setIconIndex(prev => (prev + 1) % icons.length);
@@ -48,6 +52,7 @@ export default function Header({ type = 'main' }) {
         return () => clearInterval(iconIntervalId);
     }, []);
 
+    // Kullanıcı arama çubuğuna kelime girdikçe, 300ms gecikmeli (debounce) olarak Supabase'den canlı ürün önerileri getiren arama mekanizması.
     useEffect(() => {
         const fetchSuggestions = async () => {
             if (searchValue.trim().length < 2) {
@@ -65,6 +70,7 @@ export default function Header({ type = 'main' }) {
         return () => clearTimeout(timeoutId);
     }, [searchValue]);
 
+    // Kullanıcı giriş durumunu, sepet miktarını ve favori sayısını sessionStorage ile senkronize tutan ve storage olaylarını dinleyen kanca.
     useEffect(() => {
         const updateUserData = () => {
             const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
@@ -78,6 +84,7 @@ export default function Header({ type = 'main' }) {
                     totalCartItems = userData.cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
                 }
 
+                // Sepete yeni ürün eklendiğinde sepet ikonunu zıplatma (bump) animasyonunu tetikler.
                 setCartCount(prev => {
                     if (prev !== totalCartItems && totalCartItems > prev) {
                         setIsCartBumping(true);
@@ -115,12 +122,14 @@ export default function Header({ type = 'main' }) {
                         title="HIKARI Asistan'a Sor"
                     >
                         <div className="relative w-6 h-6 flex items-center justify-center">
-                            <span className={`material-symbols-outlined text-primary absolute transition-opacity duration-500 ${iconIndex % 2 === 0 ? 'opacity-100' : 'opacity-0'}`}>
+                            <span className={`material-symbols-outlined text-primary absolute transition-all duration-500 ${iconIndex % 2 === 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
                                 search
                             </span>
-                            <span className={`material-symbols-outlined text-primary absolute transition-opacity duration-500 ${iconIndex % 2 === 1 ? 'opacity-100' : 'opacity-0'}`}>
-                                lens
-                            </span>
+                            <img 
+                                src="/hikai-logo.png" 
+                                className={`w-5 h-5 object-contain absolute transition-all duration-500 ${iconIndex % 2 === 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`} 
+                                alt="Hikai Logo" 
+                            />
                         </div>
                     </button>
 
@@ -251,9 +260,11 @@ export default function Header({ type = 'main' }) {
                     className="fixed left-0 top-1/2 -translate-y-1/2 z-40 bg-surface-container-lowest shadow-md hover:shadow-lg transition-all pl-2 pr-2 py-6 rounded-r-2xl border border-l-0 border-outline-variant/30 flex flex-col items-center justify-center group hover:pl-3"
                     title="Hikai'yi Aç"
                 >
-                    <span className="material-symbols-outlined text-primary mb-1 text-[20px] group-hover:scale-110 transition-transform">
-                        auto_awesome
-                    </span>
+                    <img 
+                        src="/hikai-logo.png" 
+                        className="w-6 h-6 object-contain mb-1 group-hover:scale-110 transition-transform" 
+                        alt="Hikai Logo" 
+                    />
                     <span className="material-symbols-outlined text-secondary text-[24px] group-hover:text-primary transition-colors">
                         chevron_right
                     </span>
