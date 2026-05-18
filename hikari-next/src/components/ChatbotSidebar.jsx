@@ -121,8 +121,9 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
             let mainCat = '';
             let subCat = '';
             let kw = item;
+            let targetDescription = item;
 
-            // Format: "AnaKategori > AltKategori > anahtar_kelime" veya "EXACT > ID > uuid"
+            // Format: "AnaKategori > AltKategori > anahtar_kelime > Hedef_Açıklama" veya "EXACT > ID > uuid"
             if (item.includes('>')) {
                 const parts = item.split('>').map(p => p.trim());
                 if (parts[0] === 'EXACT' && parts[1] === 'ID' && parts[2]) {
@@ -139,6 +140,7 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
                     mainCat = parts[0];
                     subCat = parts[1];
                     kw = parts[2];
+                    if (parts[3]) targetDescription = parts[3];
                     
                     // 1. Kategori tablosundan tam kategori ID'sini buluyoruz
                     const { data: catData } = await supabase
@@ -257,6 +259,47 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
                     const name = (p.productname || '').toLowerCase();
                     return !name.includes('bebek') && !name.includes('çocuk') && !name.includes('bebek t-shirt') && !name.includes('bebek tişört');
                 });
+            }
+
+            // SMART SCORING & POLLUTION FILTER (Anti-Aksesuar Filtresi)
+            // Eğer ürün EXACT ID ile gelmediyse, gelen ürünlerin niyetle uyuşup uyuşmadığını puanlarız.
+            if (!item.startsWith('EXACT')) {
+                const targetWords = targetDescription.toLowerCase().split(' ').filter(w => w.length > 2);
+                const pollutionWords = ['boya', 'boyası', 'kılıf', 'kılıfı', 'askı', 'askısı', 'koruyucu', 'tutucu', 'stand', 'aparat', 'aksesuar', 'yedek', 'parça', 'şarj', 'kablo', 'fırça', 'fırçası', 'maket', 'minyatür', 'kordon', 'kayış', 'temizleyici', 'sprey', 'pompa', 'jel', 'krem', 'losyon', 'çanta', 'çantası', 'oyuncak', 'set', 'seti', 'oyunu'];
+                
+                // Eğer kullanıcının aradığı anahtar kelime zaten bir kirlilik kelimesiyse, onu kirlilik listesinden çıkar!
+                const kwLower = kw.toLowerCase();
+                const activePollutionWords = pollutionWords.filter(pw => !kwLower.includes(pw) && !targetDescription.toLowerCase().includes(pw) && !uqLower.includes(pw));
+
+                currentMatches = currentMatches.map(p => {
+                    let score = 0;
+                    const pName = (p.productname || '').toLowerCase();
+                    const pWords = pName.split(/[\s-]+/);
+
+                    // 1. Hedef kelimelerin kaçı ürün isminde geçiyor?
+                    targetWords.forEach(tw => {
+                        if (pName.includes(tw)) score += 5;
+                    });
+
+                    // 2. Anahtar kelime ürün isminde var mı?
+                    if (pName.includes(kwLower)) score += 10;
+
+                    // 3. Ürün ismi kirlilik (yan ürün/aksesuar) kelimesi içeriyor mu?
+                    const isPolluted = activePollutionWords.some(pw => pWords.includes(pw) || pName.endsWith(pw));
+                    if (isPolluted) score -= 50; // Ağır ceza!
+
+                    // 4. Head Noun (Türkçe'de sondaki kelime) anahtar kelimeyle veya hedefle uyuşuyor mu?
+                    if (pWords.length > 0) {
+                        const lastWord = pWords[pWords.length - 1].replace(/[^a-zğüşöçı]/g, "");
+                        if (lastWord.includes(kwLower) || targetWords.some(tw => lastWord.includes(tw))) {
+                            score += 20; // Ana ürün olma ihtimali çok yüksek!
+                        }
+                    }
+
+                    return { ...p, _matchScore: score };
+                })
+                .filter(p => p._matchScore > 0) // Negatif puan alan (aksesuar/yan ürün) çöpe!
+                .sort((a, b) => b._matchScore - a._matchScore); // En yüksek puanlılar en üste
             }
 
             // NORMALİZASYON: Eşleşen ürünlerin kategorilerini frontend düzeyinde düzeltiyoruz!

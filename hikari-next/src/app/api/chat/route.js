@@ -106,27 +106,48 @@ export async function POST(req) {
       GÖRSEL ANALİZ:
       Fotoğraf yüklenirse, odak nesnelerini, kıyafetleri, renkleri ticari bir gözle analiz et. En satılabilir ürünleri tespit et.
 
-      ÜRÜN GÖSTERME KURALI:
-      Önerdiğin ürünlerin kullanıcının karşısına canlı ürün kartları olarak çıkmasını sağlamak için, cevabının EN SONUNA mutlaka şu formatta bir etiket ekle:
-      [Products: AnaKategori > AltKategori > anahtar_kelime | AnaKategori1 > AltKategori1 > anahtar_kelime1, AnaKategori2 > AltKategori2 > anahtar_kelime2, ...]
+      ÜRÜN GÖSTERME KURALI (HAYATİ ÖNEM TAŞIR!):
+      Kullanıcıyla ne konuşursan konuş (özür dilesen bile, hata yapsan bile), eğer bir ürün tavsiye ediyorsan veya yeni bir liste sunuyorsan, cevabının EN SONUNA mutlaka şu formatta bir etiket eklemek ZORUNDASIN. Eğer bu etiketi eklemezsen, arayüzde ürünler listelenmez ve sistem hata verir!
+
+      Format:
+      [Products: AnaKategori > AltKategori > anahtar_kelime > Hedef_Açıklama | AnaKategori1 > AltKategori1 > anahtar_kelime1 > Hedef_Açıklama1, ...]
 
       Etiket Kuralları:
-      1. Her öneriyi "AnaKategori > AltKategori > anahtar_kelime" şeklinde kategori-yönlendirmeli olarak yapmalısın. Bu sayede veritabanından ürün çekerken yanlış kategoriden (örn: yetişkin şortu ararken bebek şortu setlerinin gelmesi) eşleşme yapılması engellenir.
-      2. Dikey çizginin ("|") SOL tarafına en acil/öncelikli olan ana ürünü (krampon, çadır vb.), SAĞ tarafına ise tamamlayıcı/alternatif yan ürünleri yaz.
-      3. Anahtar kelimeler tek kelimelik, Türkçe, sade ve mutlaka TİCARİ/TEMEL odaklı olmalıdır.
-      4. Yukarıdaki 3. adımdaki MANTIKLI SIRALAMAYA ve KONSEPT SAYISINA (3-5 arası) uyarak kelimeleri yaz.
-      5. Bu etiketi her zaman cevabının EN SONUNA, cümlen bittikten sonra ekle.
+      1. KESİN KURAL: Her öneriyi "AnaKategori > AltKategori > anahtar_kelime > Hedef_Açıklama" şeklinde yapmalısın. Bu sayede akıllı filtreleme çalışır.
+      2. "Hedef_Açıklama" kısmı, kullanıcıya önerdiğin metinle birebir uyumlu olmalıdır (Örn: "Şık Günlük Elbise").
+      3. Dikey çizginin ("|") SOL tarafına en acil/öncelikli olan ana ürünü, SAĞ tarafına yan ürünleri yaz.
+      4. Anahtar kelimeler tek kelimelik, Türkçe ve TİCARİ odaklı olmalıdır.
+      5. KONSEPT SAYISINA (3-5 arası) uyarak kelimeleri yaz.
+      6. ZORUNLULUK: Bu etiketi HER ZAMAN cevabının EN SONUNA, cümlen bittikten sonra ekle. Özür dilesen bile etiketi unutma!
+
+      MAĞAZADAKİ GERÇEK KATEGORİ LİSTESİ (SADECE BUNLARI KULLAN):
+      - Kadın > Giyim
+      - Kadın > Ayakkabı
+      - Kadın > Aksesuar & Çanta
+      - Kadın > Ev & İç Giyim
+      - Erkek > Giyim
+      - Erkek > Ayakkabı
+      - Erkek > Saat & Aksesuar
+      - Erkek > İç Giyim
+      - Erkek > Çanta
+      - Spor & Outdoor > Spor Üst Giyim
+      - Spor & Outdoor > Spor Alt Giyim
+      - Spor & Outdoor > Spor Ayakkabı (Trekking botları, spor ayakkabılar buraya!)
+      - Spor & Outdoor > Spor Malzemeleri (Matara vb.)
+      - Elektronik > Giyilebilir Teknoloji
+      - Kozmetik > Cilt Bakımı
+      - Kozmetik > Saç Bakımı
 
       Sıklıkla Kullanılan Kategori Eşleşmeleri:
-      - Krampon için: Spor & Outdoor > Spor Ayakkabı > krampon
-      - Spor Şort için: Spor & Outdoor > Spor Alt Giyim > şort
-      - Spor Tişört için: Spor & Outdoor > Spor Üst Giyim > tişört
-      - Erkek Spor Çorabı için: Erkek > İç Giyim > çorap
-      - Matara/Suluk için: Spor & Outdoor > Spor Malzemeleri > matara
-      - Kadın Çorabı için: Kadın > Ev & İç Giyim > çorap
-      - Kadın Çizmesi için: Kadın > Ayakkabı > çizme
+      - Krampon / Trekking Botu için: Spor & Outdoor > Spor Ayakkabı > krampon (veya bot) > Trekking Botu
+      - Spor Şort için: Spor & Outdoor > Spor Alt Giyim > şort > Siyah Spor Şort
+      - Spor Tişört için: Spor & Outdoor > Spor Üst Giyim > tişört > Antrenman Tişörtü
+      - Erkek Çorabı için: Erkek > İç Giyim > çorap > Spor Çorap
+      - Matara/Suluk için: Spor & Outdoor > Spor Malzemeleri > matara > Detoks Suluk
+      - Kadın Çizmesi için: Kadın > Ayakkabı > çizme > Deri Çizme
+      - Kadın Giyim için: Kadın > Giyim > elbise > Günlük Elbise
 
-      Örnek: "... harika görüneceksiniz! [Products: Spor & Outdoor > Spor Ayakkabı > krampon | Spor & Outdoor > Spor Alt Giyim > şort, Spor & Outdoor > Spor Üst Giyim > tişört, Erkek > İç Giyim > çorap, Spor & Outdoor > Spor Malzemeleri > matara]"
+      Örnek: "... harika görüneceksiniz! [Products: Spor & Outdoor > Spor Ayakkabı > bot > Sağlam Trekking Botu | Spor & Outdoor > Spor Üst Giyim > tişört > Antrenman Tişörtü, Spor & Outdoor > Spor Alt Giyim > şort > Siyah Spor Şort]"
     `;
 
     // Cooldown'ı bitmiş modelleri aktif hale getirmek için mevcut zamanı alıyoruz
@@ -256,40 +277,40 @@ export async function POST(req) {
         productsTag = `[Products: Spor & Outdoor > Spor Ayakkabı > krampon | Spor & Outdoor > Spor Alt Giyim > şort, Spor & Outdoor > Spor Üst Giyim > tişört, Erkek > İç Giyim > çorap, Spor & Outdoor > Spor Malzemeleri > matara]`;
       } else if (lastUserMsg.includes('kokuyorum') || lastUserMsg.includes('kötü koku') || lastUserMsg.includes('terledim') || lastUserMsg.includes('koku') || lastUserMsg.includes('ter kokusu') || lastUserMsg.includes('duş')) {
         replyText = `Kötü koku problemini anında giderecek ve gün boyu taze, ferah ve çekici hissetmenizi sağlayacak en kaliteli kişisel bakım ürünlerini sizin için seçtim! Şık parfümler ve temizleyici sabunlar aşağıda sizi bekliyor!\n\n🎯 **Öncelikli İhtiyacın:**\n- Premium Kalıcı Odunsu & Çiçeksi Erkek Parfümü\n\n✨ **Bunlar da Lazım Olabilir:**\n- Doğal Özlü Canlandırıcı Sıvı El Sabunu\n- Yoğun Nemlendirici El ve Vücut Kremi\n- Ferahlatıcı Cilt Tonik Seti`;
-        productsTag = `[Products: Kozmetik > Parfüm > parfüm | Süpermarket > Ev & Temizlik > sabun, Kozmetik > Cilt Bakımı > krem]`;
+        productsTag = `[Products: Kozmetik > Parfüm > parfüm > Hoş Kokulu Parfüm | Süpermarket > Ev & Temizlik > sabun > El Sabunu, Kozmetik > Cilt Bakımı > krem > Nemlendirici Krem]`;
       } else if (lastUserMsg.includes('kuruyor') || lastUserMsg.includes('kuruluk') || lastUserMsg.includes('kuru cilt') || lastUserMsg.includes('çatlak') || lastUserMsg.includes('cildim')) {
         replyText = `Cildinizin kurumasını önleyecek, yoğun nemlendirici desteği sağlayarak pamuk gibi yumuşacık ve sağlıklı bir cilde kavuşmanızı sağlayacak en iyi cilt bakım kremlerini seçtim!\n\n🎯 **Öncelikli İhtiyacın:**\n- Yoğun Nemlendirici Cilt Bakım Kremi\n\n✨ **Bunlar da Lazım Olabilir:**\n- Besleyici Vücut Losyonu\n- Canlandırıcı Gözenek Sıkılaştırıcı Tonik\n- Doğal Özlü Nemlendirici Sıvı El Sabunu`;
-        productsTag = `[Products: Kozmetik > Cilt Bakımı > krem | Kozmetik > Cilt Bakımı > losyon, Kozmetik > Cilt Bakımı > tonik]`;
+        productsTag = `[Products: Kozmetik > Cilt Bakımı > krem > Yoğun Nemlendirici Bakım Kremi | Kozmetik > Cilt Bakımı > losyon > Vücut Losyonu, Kozmetik > Cilt Bakımı > tonik > Yüz Toniği]`;
       } else if (lastUserMsg.includes('hasta') || lastUserMsg.includes('hastayım') || lastUserMsg.includes('ağrı') || lastUserMsg.includes('ağrıyor') || lastUserMsg.includes('halsiz') || lastUserMsg.includes('grip') || lastUserMsg.includes('nezle')) {
         replyText = `Halsizliğinizi ve ağrılarınızı hafifletmeye yardımcı olacak, sizi sıcacık sarıp dinlendirecek bitki çayları ve konforlu ev tekstili ürünlerini sizin için derledim. Çok geçmiş olsun!\n\n🎯 **Öncelikli İhtiyacın:**\n- Yumuşacık Isı Yalıtımlı Polar Battaniye\n\n✨ **Bunlar da Lazım Olabilir:**\n- Rahatlatıcı Organik Bitki Çayı / Ihlamur Sepeti\n- Ortopedik Konforlu Uyku Yastığı\n- Mikrofiber Sıcak Tutan Çorap Seti`;
-        productsTag = `[Products: Süpermarket > Gıda > çay | Ev & Yaşam > Ev Tekstili > battaniye, Ev & Yaşam > Ev Tekstili > yastık, Kadın > Ev & İç Giyim > çorap]`;
+        productsTag = `[Products: Süpermarket > Gıda > çay > Bitki Çayı | Ev & Yaşam > Ev Tekstili > battaniye > Polar Battaniye, Ev & Yaşam > Ev Tekstili > yastık > Uyku Yastığı, Kadın > Ev & İç Giyim > çorap > Kışlık Çorap]`;
       } else if (lastUserMsg.includes('sıkıldım') || lastUserMsg.includes('sıkılıyor') || lastUserMsg.includes('canım sıkıldı') || lastUserMsg.includes('yapacak') || lastUserMsg.includes('hobi')) {
         replyText = `Can sıkıntınızı anında giderecek, sizi bambaşka dünyalara götürecek sürükleyici kitapları ve zihninizi dinlendirecek kaliteli kırtasiye ürünlerini sizin için seçtim! Keyifli vakitler dilerim.\n\n🎯 **Öncelikli İhtiyacın:**\n- Sürükleyici ve Ufuk Açıcı Roman / Kitap\n\n✨ **Bunlar da Lazım Olabilir:**\n- Çizgisiz Kaliteli Tasarım Defteri\n- İnce Uçlu Renkli Yazım Kalemleri\n- Lüks Metal Çakmak (Hobi/koleksiyon amaçlı)`;
-        productsTag = `[Products: Kitap & Kırtasiye > Roman > kitap | Kitap & Kırtasiye > Yazım Gereçleri > defter, Kitap & Kırtasiye > Yazım Gereçleri > kalem, Kitap & Kırtasiye > Çakmak Ürünleri > zippo]`;
+        productsTag = `[Products: Kitap & Kırtasiye > Roman > kitap > Roman Kitap | Kitap & Kırtasiye > Yazım Gereçleri > defter > Tasarım Defter, Kitap & Kırtasiye > Yazım Gereçleri > kalem > Yazım Kalemi, Kitap & Kırtasiye > Çakmak Ürünleri > zippo > Metal Çakmak]`;
       } else if (lastUserMsg.includes('açım') || lastUserMsg.includes('acıktı') || lastUserMsg.includes('açlık') || lastUserMsg.includes('yemek') || lastUserMsg.includes('atıştırmalık') || lastUserMsg.includes('çikolata')) {
         replyText = `Açlığınızı yatıştıracak, çayınızın veya kahvenizin yanına harika şekilde eşlik edecek en lezzetli ve taze atıştırmalık sepetini sizin için hazırladım. Afiyet olsun!\n\n🎯 **Öncelikli İhtiyacın:**\n- Karışık Lezzetli Atıştırmalık ve Bisküvi Sepeti\n\n✨ **Bunlar da Lazım Olabilir:**\n- Yoğun Aromalı Filtre Kahve / Çözünebilir Kahve\n- Premium Sütlü ve Antep Fıstıklı Çikolata\n- Taze Demleme Siyah Çay`;
-        productsTag = `[Products: Süpermarket > Gıda > atıştırmalık | Süpermarket > Gıda > çikolata, Süpermarket > Gıda > kahve, Süpermarket > Gıda > çay]`;
+        productsTag = `[Products: Süpermarket > Gıda > atıştırmalık > Atıştırmalık Sepeti | Süpermarket > Gıda > çikolata > Sütlü Çikolata, Süpermarket > Gıda > kahve > Filtre Kahve, Süpermarket > Gıda > çay > Siyah Çay]`;
       } else if (lastUserMsg.includes('uyku') || lastUserMsg.includes('uyuyamıyorum') || lastUserMsg.includes('uykusuz') || lastUserMsg.includes('yatak')) {
         replyText = `Daha rahat, kesintisiz ve huzurlu bir uyku çekmenize yardımcı olacak, konforunuzu en üst düzeye çıkaracak uyku ve yatak ürünlerini sizin için bir araya getirdim. Şimdiden tatlı rüyalar!\n\n🎯 **Öncelikli İhtiyacın:**\n- Ortopedik Boyun Destekli Konforlu Yastık\n\n✨ **Bunlar da Lazım Olabilir:**\n- %100 Pamuklu Yumuşak Nevresim Takımı\n- Rahatlatıcı Papatya / Lavanta Çayı\n- Yumuşak Unisex Ev Çorabı`;
-        productsTag = `[Products: Ev & Yaşam > Ev Tekstili > yastık | Ev & Yaşam > Ev Tekstili > nevresim, Süpermarket > Gıda > çay, Kadın > Ev & İç Giyim > çorap]`;
+        productsTag = `[Products: Ev & Yaşam > Ev Tekstili > yastık > Ortopedik Yastık | Ev & Yaşam > Ev Tekstili > nevresim > Nevresim Takımı, Süpermarket > Gıda > çay > Rahatlatıcı Çay, Kadın > Ev & İç Giyim > çorap > Yumuşak Çorap]`;
       } else if (lastUserMsg.includes('karanlık') || lastUserMsg.includes('elektrik') || lastUserMsg.includes('ışık') || lastUserMsg.includes('lamba') || lastUserMsg.includes('kesildi')) {
         replyText = `Karanlıkta kaldığınız anlarda veya elektrik kesintilerinde anında ışık kaynağı sağlayacak, dayanıklı ve şık metal çakmak ile kibrit alternatiflerini sizin için listeledim!\n\n🎯 **Öncelikli İhtiyacın:**\n- Zippo Kibrit Bitmeyen Metal Çakmak (Rüzgarda sönmeyen, benzinli klasik tasarım)\n\n✨ **Bunlar da Lazım Olabilir:**\n- Ejderha Figürlü Lüks Gazlı Çakmak\n- Mutfak Tipi Güvenli Ahşap Kibrit\n- Uzun Ömürlü Ledli El Feneri`;
-        productsTag = `[Products: Kitap & Kırtasiye > Çakmak Ürünleri > zippo | Kitap & Kırtasiye > Çakmak Ürünleri > çakmak, Ev & Yaşam > Mutfak Gereçleri > kibrit]`;
+        productsTag = `[Products: Kitap & Kırtasiye > Çakmak Ürünleri > zippo > Klasik Zippo Çakmak | Kitap & Kırtasiye > Çakmak Ürünleri > çakmak > Gazlı Çakmak, Ev & Yaşam > Mutfak Gereçleri > kibrit > Ahşap Kibrit]`;
       } else if (lastUserMsg.includes('kirli') || lastUserMsg.includes('pis') || lastUserMsg.includes('temizlik') || lastUserMsg.includes('ev battı') || lastUserMsg.includes('toz') || lastUserMsg.includes('hijyen')) {
         replyText = `Evinizde derinlemesine hijyen sağlayacak, temizliği zahmetsiz ve keyifli hale getirecek en etkili temizlik ve deterjan ürünlerini sizin için listeledim. Kolay gelsin!\n\n🎯 **Öncelikli İhtiyacın:**\n- Ultra Hijyen Sıvı Çamaşır Deterjanı\n\n✨ **Bunlar da Lazım Olabilir:**\n- Doğal Özlü Nemlendirici Sıvı El Sabunu\n- Genel Yüzey Temizleyici Sprey\n- Çift Motorlu Akıllı Şarjlı Süpürge`;
-        productsTag = `[Products: Süpermarket > Ev & Temizlik > deterjan | Süpermarket > Ev & Temizlik > sabun, Süpermarket > Ev & Temizlik > temizleyici, Elektronik > Küçük Ev Aletleri > süpürge]`;
+        productsTag = `[Products: Süpermarket > Ev & Temizlik > deterjan > Çamaşır Deterjanı | Süpermarket > Ev & Temizlik > sabun > Sıvı Sabun, Süpermarket > Ev & Temizlik > temizleyici > Yüzey Temizleyici, Elektronik > Küçük Ev Aletleri > süpürge > Şarjlı Süpürge]`;
       } else if (lastUserMsg.includes('zippo') || lastUserMsg.includes('çakmak') || lastUserMsg.includes('kibrit') || lastUserMsg.includes('ateş')) {
         replyText = `Klasik ve şık tarzınızı tamamlayacak en kaliteli Zippo ve metal çakmak modellerini sizin için seçtim. Dayanıklı yapıları ve şık tasarımlarıyla ömür boyu kullanabileceğiniz alternatifler aşağıda sizi bekliyor!\n\n🎯 **Öncelikli İhtiyacın:**\n- Zippo Kibrit Bitmeyen Metal Çakmak (Benzinle çalışan, rüzgarda sönmeyen klasik tasarım)\n\n✨ **Bunlar da Lazım Olabilir:**\n- Ejderha Figürlü Lüks Gazlı Çakmak\n- Premium Deri Çakmak Kılıfı\n- Zippo Orijinal Çakmak Benzini ve Taşı`;
-        productsTag = `[Products: Kitap & Kırtasiye > Çakmak Ürünleri > zippo | Kitap & Kırtasiye > Çakmak Ürünleri > çakmak, Ev & Yaşam > Mutfak Gereçleri > kibrit]`;
+        productsTag = `[Products: Kitap & Kırtasiye > Çakmak Ürünleri > zippo > Klasik Zippo Çakmak | Kitap & Kırtasiye > Çakmak Ürünleri > çakmak > Lüks Çakmak, Ev & Yaşam > Mutfak Gereçleri > kibrit > Ahşap Kibrit]`;
       } else if (lastUserMsg.includes('kamp') || lastUserMsg.includes('çadır') || lastUserMsg.includes('outdoor') || lastUserMsg.includes('doğa') || lastUserMsg.includes('piknik')) {
         replyText = `Doğayla baş başa muhteşem bir kamp deneyimi için en temel ve kaliteli outdoor ekipmanlarını sizin için bir araya getirdim. Keyifli ve güvenli bir kamp dilerim!\n\n🎯 **Öncelikli İhtiyacın:**\n- Çift Katmanlı Su Geçirmez Kamp Çadırı\n\n✨ **Bunlar da Lazım Olabilir:**\n- Isı Yalıtımlı Kamp Matı / Şişme Yatak\n- Termal Sporcu Matarası & Termos\n- Pratik Katlanabilir Kamp Sandalyesi`;
-        productsTag = `[Products: Spor & Outdoor > Spor Malzemeleri > çadır | Spor & Outdoor > Spor Malzemeleri > matara, Spor & Outdoor > Evde Spor Aletleri > matara]`;
+        productsTag = `[Products: Spor & Outdoor > Spor Malzemeleri > çadır > Kamp Çadırı | Spor & Outdoor > Spor Malzemeleri > matara > Termos Matara, Spor & Outdoor > Evde Spor Aletleri > matara > Matara]`;
       } else if (lastUserMsg.includes('kozmetik') || lastUserMsg.includes('makyaj') || lastUserMsg.includes('parfüm') || lastUserMsg.includes('cilt') || lastUserMsg.includes('bakım') || lastUserMsg.includes('ruj') || lastUserMsg.includes('krem')) {
         replyText = `Güzelliğinizi ve cilt sağlığınızı destekleyecek, en çok tercih edilen popüler kozmetik ve kişisel bakım ürünlerini sizin için listeledim. Işıltınız hiç sönmesin!\n\n🎯 **Öncelikli İhtiyacın:**\n- Yoğun Nemlendirici Cilt Bakım Kremi\n\n✨ **Bunlar da Lazım Olabilir:**\n- Mat Bitişli Kalıcı Likit Ruj\n- Kalıcı Odunsu & Çiçeksi Premium Parfüm\n- Gözenek Sıkılaştırıcı Canlandırıcı Tonik`;
-        productsTag = `[Products: Kozmetik > Cilt Bakımı > krem | Kozmetik > Makyaj > ruj, Kozmetik > Parfüm > parfüm]`;
+        productsTag = `[Products: Kozmetik > Cilt Bakımı > krem > Cilt Bakım Kremi | Kozmetik > Makyaj > ruj > Likit Ruj, Kozmetik > Parfüm > parfüm > Premium Parfüm]`;
       } else if (lastUserMsg.includes('telefon') || lastUserMsg.includes('bilgisayar') || lastUserMsg.includes('kulaklık') || lastUserMsg.includes('elektronik') || lastUserMsg.includes('şarj') || lastUserMsg.includes('süpürge')) {
         replyText = `Teknolojik ihtiyaçlarınızı karşılayacak, yüksek performanslı ve en popüler elektronik ürünleri sizin için seçtim. Hayatınızı kolaylaştıracak alternatifler aşağıda!\n\n🎯 **Öncelikli İhtiyacın:**\n- Yeni Nesil Akıllı Cep Telefonu\n\n✨ **Bunlar da Lazım Olabilir:**\n- Aktif Gürültü Engelleyici Kablosuz Kulaklık\n- Pratik Şarjlı El Süpürgesi\n- Hızlı Şarj Destekli Güç Kaynağı (Powerbank)`;
-        productsTag = `[Products: Elektronik > Telefon > telefon | Elektronik > Bilgisayar > kulaklık, Elektronik > Küçük Ev Aletleri > süpürge]`;
+        productsTag = `[Products: Elektronik > Telefon > telefon > Akıllı Telefon | Elektronik > Bilgisayar > kulaklık > Kablosuz Kulaklık, Elektronik > Küçük Ev Aletleri > süpürge > El Süpürgesi]`;
       } else if (lastUserMsg.includes('giyim') || lastUserMsg.includes('elbise') || lastUserMsg.includes('tişört') || lastUserMsg.includes('t-shirt') || lastUserMsg.includes('pantolon') || lastUserMsg.includes('gömlek') || lastUserMsg.includes('kombin')) {
         const isMale = lastUserMsg.includes('erkek') || lastUserMsg.includes('adam');
         const isWinter = lastUserMsg.includes('kış') || lastUserMsg.includes('soğuk') || lastUserMsg.includes('kaban') || lastUserMsg.includes('kazak');
@@ -298,29 +319,29 @@ export async function POST(req) {
         if (isMale) {
             if (isWinter) {
                 replyText = `Erkek kış modasına uygun, hem şık hem de soğuktan koruyacak harika bir kombin önerisi hazırladım!\n\n🎯 **Öncelikli İhtiyacın:**\n- Erkek Kalın Kışlık Kaban / Mont\n\n✨ **Bunlar da Lazım Olabilir:**\n- Erkek Boğazlı Triko Kazak\n- Kalın Kumaş Erkek Pantolon\n- Kışlık Erkek Bot`;
-                productsTag = `[Products: Erkek > Giyim > mont | Erkek > Giyim > kazak, Erkek > Giyim > pantolon, Erkek > Ayakkabı > bot]`;
+                productsTag = `[Products: Erkek > Giyim > mont > Kışlık Erkek Mont | Erkek > Giyim > kazak > Erkek Kazak, Erkek > Giyim > pantolon > Erkek Pantolon, Erkek > Ayakkabı > bot > Erkek Bot]`;
             } else if (isSummer) {
                 replyText = `Yaz sıcaklarında ferah tutacak, şık ve rahat erkek yazlık kombinlerini sizin için özenle seçtim!\n\n🎯 **Öncelikli İhtiyacın:**\n- Pamuklu Rahat Erkek Basic Tişört\n\n✨ **Bunlar da Lazım Olabilir:**\n- Yazlık Erkek Şort / Bermuda\n- Konforlu Erkek Spor Ayakkabı / Sneaker\n- Şık Güneş Gözlüğü`;
-                productsTag = `[Products: Erkek > Giyim > tişört | Erkek > Giyim > şort, Erkek > Ayakkabı > spor, Giyim & Aksesuar > Güneş Gözlüğü > gözlük]`;
+                productsTag = `[Products: Erkek > Giyim > tişört > Erkek Tişört | Erkek > Giyim > şort > Erkek Şort, Erkek > Ayakkabı > spor > Erkek Spor Ayakkabı, Giyim & Aksesuar > Güneş Gözlüğü > gözlük > Güneş Gözlüğü]`;
             } else {
                 replyText = `Tarzınızı yansıtacak, modern ve rahat erkek giyim kombinlerini sizin için özenle seçtim!\n\n🎯 **Öncelikli İhtiyacın:**\n- Şık Kesim Erkek Tişört / Gömlek\n\n✨ **Bunlar da Lazım Olabilir:**\n- Erkek Chino / Jean Pantolon\n- Erkek Konforlu Spor Ayakkabı\n- Aksesuar: Erkek Saat`;
-                productsTag = `[Products: Erkek > Giyim > tişört | Erkek > Giyim > pantolon, Erkek > Ayakkabı > spor, Giyim & Aksesuar > Saat > erkek]`;
+                productsTag = `[Products: Erkek > Giyim > tişört > Erkek Tişört | Erkek > Giyim > pantolon > Erkek Pantolon, Erkek > Ayakkabı > spor > Erkek Spor Ayakkabı, Giyim & Aksesuar > Saat > erkek > Erkek Kol Saati]`;
             }
         } else {
             if (isWinter) {
                 replyText = `Kış aylarında hem şık hem de sıcacık kalmanızı sağlayacak muhteşem kadın kombinlerini sizin için seçtim!\n\n🎯 **Öncelikli İhtiyacın:**\n- Yeni Sezon Şık Kadın Kaban / Mont\n\n✨ **Bunlar da Lazım Olabilir:**\n- Sıcacık Tutan Kadın Triko Kazak\n- Kışlık Kalın Kumaş Kadın Pantolon\n- Kadın Deri Çizme / Bot`;
-                productsTag = `[Products: Kadın > Giyim > kaban | Kadın > Giyim > kazak, Kadın > Giyim > pantolon, Kadın > Ayakkabı > çizme]`;
+                productsTag = `[Products: Kadın > Giyim > kaban > Kadın Kaban Mont | Kadın > Giyim > kazak > Kadın Kazak, Kadın > Giyim > pantolon > Kadın Pantolon, Kadın > Ayakkabı > çizme > Kadın Çizme]`;
             } else if (isSummer) {
                 replyText = `Yaz sıcaklarında ferahlık ve şıklığı bir arada sunan muhteşem yazlık kadın kombinlerini sizin için seçtim!\n\n🎯 **Öncelikli İhtiyacın:**\n- Yeni Sezon Şık Kadın Yazlık Elbise\n\n✨ **Bunlar da Lazım Olabilir:**\n- Kadın Şort / Tiril Etek\n- Rahat Kadın Sandalet / Terlik\n- Plaj ve Günlük Hasır Çanta`;
-                productsTag = `[Products: Kadın > Giyim > elbise | Kadın > Giyim > şort, Kadın > Ayakkabı > sandalet, Kadın > Çanta > çanta]`;
+                productsTag = `[Products: Kadın > Giyim > elbise > Kadın Yazlık Elbise | Kadın > Giyim > şort > Kadın Şort, Kadın > Ayakkabı > sandalet > Kadın Sandalet, Kadın > Çanta > çanta > Kadın Çanta]`;
             } else {
                 replyText = `Tarzınızı yansıtacak, modern ve rahat kadın giyim kombinlerini sizin için özenle seçtim. Şıklığınıza şıklık katacak en yeni sezon ürünleri aşağıda listelenmiştir!\n\n🎯 **Öncelikli İhtiyacın:**\n- Yeni Sezon Şık Kadın Günlük Elbise / Bluz\n\n✨ **Bunlar da Lazım Olabilir:**\n- Kadın Kumaş / Jean Pantolon\n- Konforlu Taban Kadın Spor Ayakkabı\n- Günlük Kullanıma Uygun Kadın Çanta`;
-                productsTag = `[Products: Kadın > Giyim > elbise | Kadın > Giyim > pantolon, Kadın > Ayakkabı > spor, Kadın > Çanta > çanta]`;
+                productsTag = `[Products: Kadın > Giyim > elbise > Kadın Günlük Elbise | Kadın > Giyim > pantolon > Kadın Pantolon, Kadın > Ayakkabı > spor > Kadın Spor Ayakkabı, Kadın > Çanta > çanta > Kadın Çanta]`;
             }
         }
       } else if (lastUserMsg.includes('temizlik') || lastUserMsg.includes('deterjan') || lastUserMsg.includes('sabun') || lastUserMsg.includes('gıda') || lastUserMsg.includes('atıştırmalık') || lastUserMsg.includes('market')) {
         replyText = `Evinizin tüm süpermarket, gıda ve temizlik ihtiyaçlarını en taze ve kaliteli seçeneklerle sizin için derledim. Keyifli alışverişler!\n\n🎯 **Öncelikli İhtiyacın:**\n- Ultra Hijyen Sıvı Çamaşır Deterjanı\n\n✨ **Bunlar da Lazım Olabilir:**\n- Doğal Özlü Nemlendirici Sıvı El Sabunu\n- Lezzetli ve Sağlıklı Atıştırmalık Sepeti\n- Organik Sızma Zeytinyağı`;
-        productsTag = `[Products: Süpermarket > Ev & Temizlik > deterjan | Süpermarket > Gıda > atıştırmalık, Süpermarket > Ev & Temizlik > sabun]`;
+        productsTag = `[Products: Süpermarket > Ev & Temizlik > deterjan > Çamaşır Deterjanı | Süpermarket > Gıda > atıştırmalık > Atıştırmalık, Süpermarket > Ev & Temizlik > sabun > Sıvı Sabun]`;
       } else {
         // HİÇBİR HAZIR KATEGORİYE UYMAYAN DURUM: DİNAMİK VERİTABANI ARAMA MOTORU DEVREDE!
         const cleanText = lastUserMsg.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "").toLowerCase();
@@ -420,9 +441,42 @@ export async function POST(req) {
           });
 
           const resultsArray = await Promise.all(searchPromises);
-          const matchedProducts = resultsArray.flat().filter((p, index, self) => 
+          let matchedProducts = resultsArray.flat().filter((p, index, self) => 
             self.findIndex(t => t.productname === p.productname) === index
           );
+
+          // AKILLI EŞLEŞTİRİCİ (SMART SCORER) - Backend
+          // "dağ" aratıldığında "Isı Dağılımı (Saç Düzleştirici)" gelmesi gibi kronik Hataları (False Positives) önler!
+          
+          const poisonWords = ['bisiklet', 'araba', 'motor', 'bebek', 'kitap', 'roman', 'boya', 'kılıf', 'askı', 'oyuncak', 'yedek', 'parça'];
+          const userWordsStr = lastUserMsg.toLowerCase();
+
+          matchedProducts = matchedProducts.map(p => {
+              let score = 0;
+              const pName = (p.productname || '').toLowerCase();
+              const pWords = pName.split(/[\s-]+/);
+              
+              searchKeywords.forEach(kw => {
+                  const kwLower = kw.toLowerCase();
+                  if (pName.includes(kwLower)) score += 5;
+                  
+                  // Tam kelime eşleşmesi çok değerli!
+                  if (pWords.includes(kwLower)) score += 20;
+                  
+                  // Kısa kelimelerde (4 harf veya altı) kısmi eşleşme genellikle hatadır (dağ -> dağılım, çam -> çamaşır)
+                  if (kwLower.length <= 4 && pName.includes(kwLower) && !pWords.includes(kwLower) && !pWords.some(w => w.startsWith(kwLower))) {
+                      score -= 20; // Ağır ceza!
+                  }
+              });
+              
+              // Kirlilik/Yan Ürün Filtresi
+              const isPoisoned = poisonWords.some(pw => (pWords.includes(pw) || pName.endsWith(pw)) && !userWordsStr.includes(pw));
+              if (isPoisoned) score -= 50;
+
+              return { ...p, _score: score };
+          })
+          .filter(p => p._score >= 10) // Sadece yüksek isabetli ürünleri geçir (En az 1 tam kelime eşleşmesi veya 2 güçlü kısmi eşleşme)
+          .sort((a, b) => b._score - a._score);
 
           // Sorgunun fiziksel bir problem veya vücut bölgesi içerip içermediğini analiz ediyoruz (Türkçe ve Türkçe-olmayan karakter varyasyonları dahil)
           const isPhysicalOrBodyProblem = lastUserMsg.includes('kaşın') || lastUserMsg.includes('kaşıntı') || 
@@ -433,26 +487,21 @@ export async function POST(req) {
                                           lastUserMsg.includes('sivilce') || lastUserMsg.includes('kuruluk') || 
                                           lastUserMsg.includes('sırt') || lastUserMsg.includes('sirt') ||
                                           lastUserMsg.includes('kol') || lastUserMsg.includes('bacak') || 
-                                          lastUserMsg.includes('boyun') || lastUserMsg.includes('başım') ||
-                                          lastUserMsg.includes('basim');
+                                          lastUserMsg.includes('sırt') || lastUserMsg.includes('kol') || 
+                                          lastUserMsg.includes('bacak') || lastUserMsg.includes('boyun') || 
+                                          lastUserMsg.includes('başım');
 
-          // Kullanıcının gerçekten Kitap/Kırtasiye/Eğitim ürünü isteyip istemediğini anlıyoruz
           const isBookOrStationeryIntent = lastUserMsg.includes('kitap') || lastUserMsg.includes('roman') || 
                                            lastUserMsg.includes('oku') || lastUserMsg.includes('defter') || 
                                            lastUserMsg.includes('kalem') || lastUserMsg.includes('kırtasiye') || 
-                                           lastUserMsg.includes('yazar') || lastUserMsg.includes('ajanda') ||
-                                           lastUserMsg.includes('hikaye') || lastUserMsg.includes('masal') ||
-                                           lastUserMsg.includes('kpss') || lastUserMsg.includes('yks') ||
-                                           lastUserMsg.includes('okul') || lastUserMsg.includes('öğrenci') || 
-                                           lastUserMsg.includes('ders') || lastUserMsg.includes('sınav') || 
-                                           lastUserMsg.includes('üniversite') || lastUserMsg.includes('lise');
+                                           lastUserMsg.includes('yazar') || lastUserMsg.includes('ders') || 
+                                           lastUserMsg.includes('sınav');
 
           const finalProducts = matchedProducts.filter(p => {
             const mainCat = (p.main_category || '').toLowerCase();
             const subCat = (p.sub_category || '').toLowerCase();
             const prodName = (p.productname || '').toLowerCase();
             
-            // 1. Fiziksel problem kontrolü
             if (isPhysicalOrBodyProblem) {
               if (!(mainCat.includes('kozmetik') || mainCat.includes('süpermarket') || mainCat.includes('yaşam') || mainCat.includes('ev'))) {
                 return false;
