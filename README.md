@@ -11,3 +11,8 @@ NEXT_PUBLIC_SUPABASE_URL=https://tdqqfbuftgmnlzirexjh.supabase.co/
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkcXFmYnVmdGdtbmx6aXJleGpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MzgzOTEsImV4cCI6MjA5NDQxNDM5MX0.QuwUSAYlZU9ohCUonAOa_Jc48dsV7F-JFFLfY02rASw
 
 ```
+Eğer Hikai'yi çalışır olarak görmek isterseniz 
+GEMINI_API_KEY=
+GEMINI_API_KEY2=
+GEMINI_API_KEY3=
+şeklinde .env.local kısmına ekleme yapıp Gemini API'si bağlayabilirsiniz.
