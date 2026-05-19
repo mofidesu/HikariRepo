@@ -11,6 +11,7 @@
     "import": "node import_products.mjs"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.105.4",
     "next": "16.2.6",
     "papaparse": "^5.5.3",
