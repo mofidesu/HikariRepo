@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 // HIKARI E-Ticaret platformunun ana karşılama (Landing) sayfası.
 export default function Home() {
@@ -13,7 +14,13 @@ export default function Home() {
     const [localProducts, setLocalProducts] = useState([]);
     const sliderRef = useRef(null);
 
+    // Curation states
+    const [hikariSelection, setHikariSelection] = useState([]);
+    const [urbanBoutique, setUrbanBoutique] = useState([]);
+    const [autumnSpirit, setAutumnSpirit] = useState([]);
+
     // Sayfa yüklendiğinde yerel products.json kataloğunu çeker, karıştırır (shuffled) ve anasayfa vitrinlerine dağıtır.
+    // Aynı zamanda Supabase veritabanından Canlı Veri Akışı ile tematik sonbahar seçkilerini çeker.
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -29,8 +36,46 @@ export default function Home() {
                 console.error("Error fetching local products:", error);
             }
         };
+
+        const fetchCurations = async () => {
+            try {
+                const [hikariRes, urbanRes, autumnRes] = await Promise.all([
+                    supabase
+                        .from('products')
+                        .select('*')
+                        .in('main_category', ['Kadın', 'Erkek'])
+                        .or('productname.ilike.%deri%,productname.ilike.%klasik%,productname.ilike.%trençkot%,productname.ilike.%kaban%,productname.ilike.%blazer%,productname.ilike.%minimalist%')
+                        .gte('stars', 4.0)
+                        .order('reviews', { ascending: false })
+                        .limit(15),
+                    supabase
+                        .from('products')
+                        .select('*')
+                        .in('main_category', ['Kadın', 'Erkek'])
+                        .or('productname.ilike.%jean%,productname.ilike.%kot%,productname.ilike.%sneaker%,productname.ilike.%kargo%,productname.ilike.%ceket%,productname.ilike.%tişört%')
+                        .gte('stars', 4.0)
+                        .order('reviews', { ascending: false })
+                        .limit(15),
+                    supabase
+                        .from('products')
+                        .select('*')
+                        .in('main_category', ['Kadın', 'Erkek'])
+                        .or('productname.ilike.%kazak%,productname.ilike.%hırka%,productname.ilike.%sweatshirt%,productname.ilike.%triko%,productname.ilike.%bot%,productname.ilike.%atkı%,productname.ilike.%şal%')
+                        .gte('stars', 4.0)
+                        .order('reviews', { ascending: false })
+                        .limit(15)
+                ]);
+
+                if (hikariRes.data) setHikariSelection(hikariRes.data);
+                if (urbanRes.data) setUrbanBoutique(urbanRes.data);
+                if (autumnRes.data) setAutumnSpirit(autumnRes.data);
+            } catch (error) {
+                console.error("Error fetching curations:", error);
+            }
+        };
         
         fetchProducts();
+        fetchCurations();
     }, []);
 
     // "Daha Fazla Keşfet" butonu tıklandığında listeden sıradaki 4 ürünü yükleyen fonksiyon.
@@ -144,18 +189,26 @@ export default function Home() {
                                         <p className="text-xs text-secondary italic">Premium Minimalist Stil</p>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div className="aspect-square bg-surface-container-lowest rounded-lg overflow-hidden">
-                                        <img src="/datas/data/22245.jpg" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                                {hikariSelection.length > 0 ? (
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <div className="aspect-square bg-white rounded-lg overflow-hidden border border-outline-variant/10">
+                                            <img src={hikariSelection[0]?.imgUrl} className="w-full h-full object-contain p-1 group-hover:scale-105 transition-transform" alt="Hikari Product 1" />
+                                        </div>
+                                        <div className="aspect-square bg-white rounded-lg overflow-hidden border border-outline-variant/10">
+                                            <img src={hikariSelection[1]?.imgUrl} className="w-full h-full object-contain p-1 group-hover:scale-105 transition-transform" alt="Hikari Product 2" />
+                                        </div>
+                                        <div className="aspect-square bg-surface-container-lowest rounded-lg flex items-center justify-center border border-dashed border-outline-variant/30">
+                                            <span className="text-primary font-bold text-sm">+{hikariSelection.length - 2}</span>
+                                        </div>
                                     </div>
-                                    <div className="aspect-square bg-surface-container-lowest rounded-lg overflow-hidden">
-                                        <img src="/datas/data/22867.jpg" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                                ) : (
+                                    <div className="grid grid-cols-3 gap-2 animate-pulse">
+                                        <div className="aspect-square bg-surface-container-low rounded-lg"></div>
+                                        <div className="aspect-square bg-surface-container-low rounded-lg"></div>
+                                        <div className="aspect-square bg-surface-container-low rounded-lg"></div>
                                     </div>
-                                    <div className="aspect-square bg-surface-container-lowest rounded-lg flex items-center justify-center border-2 border-dashed border-outline-variant/20">
-                                        <span className="text-primary font-bold text-sm">+12</span>
-                                    </div>
-                                </div>
-                                <Link href="/collection?id=autumn" className="text-center py-3 bg-primary/5 text-primary rounded-xl text-sm font-bold hover:bg-primary hover:text-white transition-all">Seçkiyi Gör</Link>
+                                )}
+                                <Link href="/collection?curation=hikari" className="text-center py-3 bg-primary/5 text-primary rounded-xl text-sm font-bold hover:bg-primary hover:text-white transition-all">Seçkiyi Gör</Link>
                             </div>
 
                             {/* 5. Seller Card 2 */}
@@ -167,18 +220,26 @@ export default function Home() {
                                         <p className="text-xs text-secondary italic">Modern Şehir Esintisi</p>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div className="aspect-square bg-surface-container-lowest rounded-lg overflow-hidden">
-                                        <img src="/datas/data/50945.jpg" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                                {urbanBoutique.length > 0 ? (
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <div className="aspect-square bg-white rounded-lg overflow-hidden border border-outline-variant/10">
+                                            <img src={urbanBoutique[0]?.imgUrl} className="w-full h-full object-contain p-1 group-hover:scale-105 transition-transform" alt="Urban Product 1" />
+                                        </div>
+                                        <div className="aspect-square bg-white rounded-lg overflow-hidden border border-outline-variant/10">
+                                            <img src={urbanBoutique[1]?.imgUrl} className="w-full h-full object-contain p-1 group-hover:scale-105 transition-transform" alt="Urban Product 2" />
+                                        </div>
+                                        <div className="aspect-square bg-surface-container-lowest rounded-lg flex items-center justify-center border border-dashed border-outline-variant/30">
+                                            <span className="text-primary font-bold text-sm">+{urbanBoutique.length - 2}</span>
+                                        </div>
                                     </div>
-                                    <div className="aspect-square bg-surface-container-lowest rounded-lg flex items-center justify-center border-2 border-dashed border-outline-variant/20">
-                                        <span className="text-primary font-bold text-sm">+8</span>
+                                ) : (
+                                    <div className="grid grid-cols-3 gap-2 animate-pulse">
+                                        <div className="aspect-square bg-surface-container-low rounded-lg"></div>
+                                        <div className="aspect-square bg-surface-container-low rounded-lg"></div>
+                                        <div className="aspect-square bg-surface-container-low rounded-lg"></div>
                                     </div>
-                                    <div className="aspect-square bg-surface-container-lowest rounded-lg overflow-hidden">
-                                        <img src="/datas/data/26372.jpg" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
-                                    </div>
-                                </div>
-                                <Link href="/collection?id=urban" className="text-center py-3 bg-primary/5 text-primary rounded-xl text-sm font-bold hover:bg-primary hover:text-white transition-all">Seçkiyi Gör</Link>
+                                )}
+                                <Link href="/collection?curation=urban" className="text-center py-3 bg-primary/5 text-primary rounded-xl text-sm font-bold hover:bg-primary hover:text-white transition-all">Seçkiyi Gör</Link>
                             </div>
 
                             {/* 6. Seller Card 3 */}
@@ -190,18 +251,26 @@ export default function Home() {
                                         <p className="text-xs text-secondary italic">Sıcak & Samimi Dokular</p>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div className="aspect-square bg-surface-container-lowest rounded-lg flex items-center justify-center border-2 border-dashed border-outline-variant/20">
-                                        <span className="text-primary font-bold text-sm">+5</span>
+                                {autumnSpirit.length > 0 ? (
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <div className="aspect-square bg-white rounded-lg overflow-hidden border border-outline-variant/10">
+                                            <img src={autumnSpirit[0]?.imgUrl} className="w-full h-full object-contain p-1 group-hover:scale-105 transition-transform" alt="Autumn Product 1" />
+                                        </div>
+                                        <div className="aspect-square bg-white rounded-lg overflow-hidden border border-outline-variant/10">
+                                            <img src={autumnSpirit[1]?.imgUrl} className="w-full h-full object-contain p-1 group-hover:scale-105 transition-transform" alt="Autumn Product 2" />
+                                        </div>
+                                        <div className="aspect-square bg-surface-container-lowest rounded-lg flex items-center justify-center border border-dashed border-outline-variant/30">
+                                            <span className="text-primary font-bold text-sm">+{autumnSpirit.length - 2}</span>
+                                        </div>
                                     </div>
-                                    <div className="aspect-square bg-surface-container-lowest rounded-lg overflow-hidden">
-                                        <img src="/datas/data/14997.jpg" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                                ) : (
+                                    <div className="grid grid-cols-3 gap-2 animate-pulse">
+                                        <div className="aspect-square bg-surface-container-low rounded-lg"></div>
+                                        <div className="aspect-square bg-surface-container-low rounded-lg"></div>
+                                        <div className="aspect-square bg-surface-container-low rounded-lg"></div>
                                     </div>
-                                    <div className="aspect-square bg-surface-container-lowest rounded-lg overflow-hidden">
-                                        <img src="/datas/data/1584.jpg" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
-                                    </div>
-                                </div>
-                                <Link href="/collection?id=autumnspirit" className="text-center py-3 bg-primary/5 text-primary rounded-xl text-sm font-bold hover:bg-primary hover:text-white transition-all">Seçkiyi Gör</Link>
+                                )}
+                                <Link href="/collection?curation=autumnspirit" className="text-center py-3 bg-primary/5 text-primary rounded-xl text-sm font-bold hover:bg-primary hover:text-white transition-all">Seçkiyi Gör</Link>
                             </div>
                         </div>
                     </div>

@@ -12,6 +12,7 @@ function CollectionContent() {
     const searchParams = useSearchParams();
     const categoryName = searchParams.get('category');
     const searchQuery = searchParams.get('q');
+    const curationName = searchParams.get('curation');
 
     const [data, setData] = useState({
         title: 'Koleksiyon',
@@ -33,7 +34,27 @@ function CollectionContent() {
     // Aktif filtrelere göre veritabanından çekilebilecek toplam ürün sayısını bulan sorgu fonksiyonu.
     const fetchTotalCount = async (config) => {
         let count = 0;
-        if (config.type === 'search') {
+        if (config.type === 'curation') {
+            if (config.value === 'hikari') {
+                const { count: c } = await supabase.from('products').select('*', { count: 'exact', head: true })
+                    .in('main_category', ['Kadın', 'Erkek'])
+                    .or('productname.ilike.%deri%,productname.ilike.%klasik%,productname.ilike.%trençkot%,productname.ilike.%kaban%,productname.ilike.%blazer%,productname.ilike.%minimalist%')
+                    .gte('stars', 4.0);
+                count = c || 0;
+            } else if (config.value === 'urban') {
+                const { count: c } = await supabase.from('products').select('*', { count: 'exact', head: true })
+                    .in('main_category', ['Kadın', 'Erkek'])
+                    .or('productname.ilike.%jean%,productname.ilike.%kot%,productname.ilike.%sneaker%,productname.ilike.%kargo%,productname.ilike.%ceket%,productname.ilike.%tişört%')
+                    .gte('stars', 4.0);
+                count = c || 0;
+            } else if (config.value === 'autumnspirit') {
+                const { count: c } = await supabase.from('products').select('*', { count: 'exact', head: true })
+                    .in('main_category', ['Kadın', 'Erkek'])
+                    .or('productname.ilike.%kazak%,productname.ilike.%hırka%,productname.ilike.%sweatshirt%,productname.ilike.%triko%,productname.ilike.%bot%,productname.ilike.%atkı%,productname.ilike.%şal%')
+                    .gte('stars', 4.0);
+                count = c || 0;
+            }
+        } else if (config.type === 'search') {
             const { count: c } = await supabase.from('products').select('*', { count: 'exact', head: true }).ilike('productname', `%${config.value}%`);
             count = c || 0;
         } else if (config.type === 'category_id') {
@@ -53,7 +74,30 @@ function CollectionContent() {
     const getProductsQuery = (config, sortMethod) => {
         let q = supabase.from(sortMethod === 'recommended' ? 'random_products' : 'products').select('*').limit(40);
         
-        if (config.type === 'search') q = q.ilike('productname', `%${config.value}%`);
+        if (config.type === 'curation') {
+            q = supabase.from('products').select('*');
+            if (config.value === 'hikari') {
+                q = q.in('main_category', ['Kadın', 'Erkek'])
+                    .or('productname.ilike.%deri%,productname.ilike.%klasik%,productname.ilike.%trençkot%,productname.ilike.%kaban%,productname.ilike.%blazer%,productname.ilike.%minimalist%')
+                    .gte('stars', 4.0);
+            } else if (config.value === 'urban') {
+                q = q.in('main_category', ['Kadın', 'Erkek'])
+                    .or('productname.ilike.%jean%,productname.ilike.%kot%,productname.ilike.%sneaker%,productname.ilike.%kargo%,productname.ilike.%ceket%,productname.ilike.%tişört%')
+                    .gte('stars', 4.0);
+            } else if (config.value === 'autumnspirit') {
+                q = q.in('main_category', ['Kadın', 'Erkek'])
+                    .or('productname.ilike.%kazak%,productname.ilike.%hırka%,productname.ilike.%sweatshirt%,productname.ilike.%triko%,productname.ilike.%bot%,productname.ilike.%atkı%,productname.ilike.%şal%')
+                    .gte('stars', 4.0);
+            }
+            
+            if (sortMethod === 'price_asc') q = q.order('price', { ascending: true });
+            else if (sortMethod === 'price_desc') q = q.order('price', { ascending: false });
+            else if (sortMethod === 'most_reviewed') q = q.order('reviews', { ascending: false });
+            else q = q.order('reviews', { ascending: false });
+
+            return q.limit(15);
+        }
+        else if (config.type === 'search') q = q.ilike('productname', `%${config.value}%`);
         else if (config.type === 'category_id') q = q.eq('category_id', config.value);
         else if (config.type === 'category_fallback') q = q.or(`sub_category.eq."${config.value}",main_category.eq."${config.value}"`);
         
@@ -74,7 +118,22 @@ function CollectionContent() {
             let subtitle = 'Tüm Ürünler';
             let description = 'Mağazamızdaki öne çıkan ürünleri keşfedin.';
 
-            if (searchQuery) {
+            if (curationName) {
+                config = { type: 'curation', value: curationName };
+                if (curationName === 'hikari') {
+                    displayTitle = 'HIKARI Selection';
+                    subtitle = 'Premium Minimalist Stil';
+                    description = 'Minimalist detaylar, zamansız kesimler ve üstün kaliteli dokularla sonbahar şıklığı.';
+                } else if (curationName === 'urban') {
+                    displayTitle = 'Urban Boutique';
+                    subtitle = 'Modern Şehir Esintisi';
+                    description = 'Şehrin dinamik ritmine uyum sağlayan modern tasarımlar, ceketler ve jeanler.';
+                } else if (curationName === 'autumnspirit') {
+                    displayTitle = 'Autumn Spirit';
+                    subtitle = 'Sıcak & Samimi Dokular';
+                    description = 'Sonbaharın sıcaklığını hissettiren trikolar, kazaklar, yumuşacık şallar ve botlar.';
+                }
+            } else if (searchQuery) {
                 config = { type: 'search', value: searchQuery };
                 displayTitle = `"${searchQuery}" İçin Sonuçlar`;
                 subtitle = 'Arama Sonuçları';
@@ -99,20 +158,30 @@ function CollectionContent() {
                     ...prev,
                     title: displayTitle,
                     subtitle,
-                    description: searchQuery ? `Aramanızla eşleşen ürünler bulunuyor.` : `${displayTitle} kategorisindeki ürünleri keşfedin.`,
+                    description: searchQuery ? `Aramanızla eşleşen ürünler bulunuyor.` : (curationName ? description : `${displayTitle} kategorisindeki ürünleri keşfedin.`),
                     products: products
                 }));
                 document.title = `HIKARI | ${displayTitle}`;
             }
+            
+            // Limit curations to their fixed pool size (no infinite scroll)
+            if (curationName) {
+                setHasMore(false);
+            }
+            
             setIsLoading(false);
         };
 
         fetchInitial();
-    }, [categoryName, searchQuery, sortBy]);
+    }, [categoryName, searchQuery, curationName, sortBy]);
 
     // Sayfa aşağı kaydırıldıkça (Infinite Scroll) yeni ürünleri arka planda yükleyen fonksiyon.
     const loadMore = async () => {
         if (isLoadingMore || !hasMore || !queryConfig) return;
+        if (queryConfig.type === 'curation') {
+            setHasMore(false);
+            return;
+        }
         setIsLoadingMore(true);
         const { data: newProducts } = await getProductsQuery(queryConfig);
         
