@@ -12,7 +12,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzd
 
 ```
 Eğer Hikai'yi çalışır olarak görmek isterseniz 
+```
 GEMINI_API_KEY=
-GEMINI_API_KEY2=
-GEMINI_API_KEY3=
+GEMINI_API_KEY_2=
+GEMINI_API_KEY_3=
+```
 şeklinde .env.local kısmına ekleme yapıp Gemini API'si bağlayabilirsiniz.
