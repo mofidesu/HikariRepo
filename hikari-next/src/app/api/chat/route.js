@@ -10,10 +10,17 @@ let responderCooldowns = {};
 let preferredPlanner   = 'gemini-2.5-flash';
 let preferredResponder = 'gemini-2.5-flash';
 
-// ── Gemini Çağrı Yardımcısı ─────────────────────────────────────────────────
-async function callGemini({ apiKey, models, cooldowns, getPreferred, setPreferred, body, label }) {
+// Son başarılı istek zamanı — client throttle için
+let lastRequestTime = 0;
+const MIN_REQUEST_INTERVAL = 6_000; // 6 saniye minimum aralık
+
+// ── Gemini Çağrı Yardımcısı (Multi-Key + Retry) ─────────────────────────────
+async function callGemini({ apiKeys, models, cooldowns, getPreferred, setPreferred, body, label }) {
+  // apiKeys: string[] — birden fazla key denenebilir
+  const keys = Array.isArray(apiKeys) ? apiKeys.filter(Boolean) : [apiKeys].filter(Boolean);
   const now = Date.now();
   const preferred = getPreferred();
+  let lastError = '';
 
   const sorted = [...models].sort((a, b) => {
     const cA = cooldowns[a] || 0, cB = cooldowns[b] || 0;
@@ -24,27 +31,57 @@ async function callGemini({ apiKey, models, cooldowns, getPreferred, setPreferre
     return cA - cB;
   });
 
-  for (const model of sorted) {
-    try {
-      console.log(`[${label}] Trying: ${model}`);
-      const res  = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
-      );
-      const data = await res.json();
-      if (res.ok) {
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) { setPreferred(model); cooldowns[model] = 0; return { ok: true, text }; }
-      } else {
-        console.warn(`[${label}] ${model} → ${res.status}`);
-        if (res.status === 429 || res.status >= 500) cooldowns[model] = Date.now() + 60_000;
+  for (const apiKey of keys) {
+    for (const model of sorted) {
+      // Cooldown kontrolü
+      if ((cooldowns[`${model}_${apiKey.slice(-6)}`] || 0) > now) {
+        console.log(`[${label}] ${model} (key:...${apiKey.slice(-6)}) cooldown'da, atlaniyor`);
+        continue;
       }
-    } catch (e) {
-      console.error(`[${label}] ${model} exception:`, e.message);
-      cooldowns[model] = Date.now() + 60_000;
+
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          if (attempt > 0) {
+            console.log(`[${label}] Retry #${attempt} for ${model} (3s bekleniyor...)`);
+            await new Promise(r => setTimeout(r, 3000));
+          }
+          console.log(`[${label}] Trying: ${model} (key:...${apiKey.slice(-6)}) attempt:${attempt}`);
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+            { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+          );
+          const data = await res.json();
+          if (res.ok) {
+            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) {
+              setPreferred(model);
+              cooldowns[model] = 0;
+              cooldowns[`${model}_${apiKey.slice(-6)}`] = 0;
+              return { ok: true, text };
+            }
+            lastError = `${model}: empty response`;
+          } else {
+            lastError = `${model}: HTTP ${res.status}`;
+            console.warn(`[${label}] ${model} → ${res.status} (key:...${apiKey.slice(-6)})`);
+            if (res.status === 429) {
+              cooldowns[`${model}_${apiKey.slice(-6)}`] = Date.now() + 30_000;
+              if (attempt === 0) continue; // retry once for 429
+            }
+            if (res.status >= 500) {
+              cooldowns[`${model}_${apiKey.slice(-6)}`] = Date.now() + 30_000;
+            }
+            break; // other errors: no retry, try next model
+          }
+        } catch (e) {
+          lastError = `${model}: ${e.message}`;
+          console.error(`[${label}] ${model} exception:`, e.message);
+          cooldowns[`${model}_${apiKey.slice(-6)}`] = Date.now() + 30_000;
+          break;
+        }
+      }
     }
   }
-  return { ok: false };
+  return { ok: false, error: lastError };
 }
 
 // ── Görsel Doğrulama (Gemini Vision) ────────────────────────────────────────
@@ -110,13 +147,14 @@ async function validateWithImages(products, userQuery, apiKey) {
 }
 
 // ── Ürün Arama (Planner JSON → Supabase) ────────────────────────────────────
+// Cascade search: keywords dizisindeki terimleri spesifikten genele dener,
+// yeterli sonuç bulamazsa alternatives dizisine geçer.
 async function searchProducts(planItems, userQuery) {
   if (!planItems?.length) return [];
 
   const uqLower = userQuery.toLowerCase().replace(/[.,?!]/g, '');
   const uqWords = uqLower.split(' ').filter(w => w.length > 3);
 
-  // Yetişkin niyet tespiti — çocuk/bebek ürünlerini filtrele
   const ADULT_KW = ['erkek', 'kadın', 'halısaha', 'spor', 'futbol', 'maç', 'antrenman', 'koşu', 'fitness', 'plaj', 'tatil', 'ofis', 'iş'];
   const CHILD_KW = ['bebek', 'çocuk', 'oyuncak'];
   const isAdult = ADULT_KW.some(k => uqLower.includes(k));
@@ -124,32 +162,26 @@ async function searchProducts(planItems, userQuery) {
 
   const POLLUTION = ['boya', 'boyası', 'kılıf', 'kılıfı', 'koruyucu', 'tutucu', 'stand', 'aparat', 'yedek', 'parça', 'şarj', 'kablo', 'fırça', 'maket', 'kordon', 'kayış', 'sprey', 'pompa'];
 
-  const results = [];
+  const MIN_RESULTS = 2;
 
-  for (const item of planItems) {
-    const { mainCat = '', subCat = '', keyword = '', description = '' } = item;
-    if (!keyword.trim()) continue;
-
+  // Tek keyword ile DB araması
+  const searchByKeyword = async (kw, mainCat, subCat) => {
     let matches = [];
-
-    // 1. Kategori + keyword
     if (mainCat && subCat) {
       const { data: cats } = await supabase.from('categories').select('id')
         .ilike('main_category', mainCat).ilike('sub_category', subCat).limit(1);
       const catId = cats?.[0]?.id;
       if (catId) {
         const { data } = await supabase.from('products').select('*')
-          .eq('category_id', catId).ilike('productname', `%${keyword}%`).limit(5);
+          .eq('category_id', catId).ilike('productname', `%${kw}%`).limit(5);
         if (data?.length) matches = data;
       }
     }
-
-    // 2. Global fallback
-    if (matches.length < 3) {
+    if (matches.length < MIN_RESULTS) {
       const { data } = await supabase.from('products').select('*')
-        .ilike('productname', `%${keyword}%`).limit(12);
+        .ilike('productname', `%${kw}%`).limit(12);
       if (data?.length) {
-        const tgtMain = mainCat.toLowerCase();
+        const tgtMain = (mainCat || '').toLowerCase();
         const extra = data.filter(g => {
           const gM = (g.main_category || '').toLowerCase();
           const gS = (g.sub_category  || '').toLowerCase();
@@ -163,11 +195,46 @@ async function searchProducts(planItems, userQuery) {
           return true;
         });
         const ids = new Set(matches.map(m => m.id));
-        matches = [...matches, ...extra.filter(g => !ids.has(g.id))].slice(0, 5);
+        matches = [...matches, ...extra.filter(g => !ids.has(g.id))].slice(0, 6);
+      }
+    }
+    return matches;
+  };
+
+  const results = [];
+
+  for (const item of planItems) {
+    const keywords = item.keywords?.length ? item.keywords : (item.keyword ? [item.keyword] : []);
+    const alternatives = item.alternatives || [];
+    const { mainCat = '', subCat = '', description = '' } = item;
+    if (!keywords.length && !alternatives.length) continue;
+
+    let matches = [];
+
+    // AŞAMA A: keywords dizisini spesifikten genele dene
+    for (const kw of keywords) {
+      if (!kw.trim()) continue;
+      matches = await searchByKeyword(kw, mainCat, subCat);
+      console.log(`[Search] keyword="${kw}" → ${matches.length} results`);
+      if (matches.length >= MIN_RESULTS) break;
+    }
+
+    // AŞAMA B: Yetersizse alternatives dene
+    if (matches.length < MIN_RESULTS && alternatives.length) {
+      console.log(`[Search] Primary keywords insufficient, trying alternatives...`);
+      for (const alt of alternatives) {
+        if (!alt.trim()) continue;
+        const altMatches = await searchByKeyword(alt, mainCat, subCat);
+        console.log(`[Search] alternative="${alt}" → ${altMatches.length} results`);
+        if (altMatches.length >= MIN_RESULTS) {
+          const ids = new Set(matches.map(m => m.id));
+          matches = [...matches, ...altMatches.filter(a => !ids.has(a.id))];
+          break;
+        }
       }
     }
 
-    // 3. Yetişkin filtresi
+    // Yetişkin filtresi
     if (isAdult && !isChild) {
       matches = matches.filter(p => {
         const n = (p.productname || '').toLowerCase();
@@ -177,25 +244,28 @@ async function searchProducts(planItems, userQuery) {
       });
     }
 
-    // 4. Smart Scoring
-    const kwL   = keyword.toLowerCase();
-    const descL = description.toLowerCase();
+    // Smart Scoring
+    const primaryKw = (keywords[0] || '').toLowerCase();
+    const descL = (description || '').toLowerCase();
     const tWords = descL.split(' ').filter(w => w.length > 2);
-    const activePoll = POLLUTION.filter(pw => !kwL.includes(pw) && !descL.includes(pw) && !uqLower.includes(pw));
+    const activePoll = POLLUTION.filter(pw => !primaryKw.includes(pw) && !descL.includes(pw) && !uqLower.includes(pw));
 
     matches = matches.map(p => {
       let score = 0;
       const pN = (p.productname || '').toLowerCase();
       const pW = pN.split(/[\s-]+/);
+      for (const kw of keywords) {
+        const kwL = kw.toLowerCase();
+        if (pN.includes(kwL)) score += 10;
+      }
       tWords.forEach(tw => { if (pN.includes(tw)) score += 5; });
-      if (pN.includes(kwL)) score += 10;
       if (activePoll.some(pw => pW.includes(pw) || pN.endsWith(pw))) score -= 50;
       const last = pW[pW.length - 1]?.replace(/[^a-zğüşöçı]/g, '') || '';
-      if (last.includes(kwL) || tWords.some(tw => last.includes(tw))) score += 20;
+      if (last.includes(primaryKw) || tWords.some(tw => last.includes(tw))) score += 20;
       return { ...p, _score: score };
     }).filter(p => p._score > 0).sort((a, b) => b._score - a._score);
 
-    results.push(...matches);
+    results.push(...matches.slice(0, 5));
   }
 
   const seen = new Set();
@@ -239,7 +309,35 @@ function buildFallbackText(planData, primary, secondary) {
 }
 
 // ── Sistem Promptları ────────────────────────────────────────────────────────
-const PLANNER_PROMPT = `Sen HIKARI e-ticaret mağazasının ürün planlama motorusun. Kullanıcının mesajını analiz et ve JSON plan üret.
+const PLANNER_PROMPT = `Sen HIKARI e-ticaret mağazasının AKILLI ürün planlama motorusun. Kullanıcının gerçek ihtiyacını derinlemesine analiz et. Mesajındaki kelimeleri değil, ARKASINDAKI NİYETİ anla.
+
+NİYET ANALİZ KURALLARI:
+- Kullanıcının cümlesindeki kelimeleri birebir ürün olarak arama! Cümlenin bağlamından gerçek ihtiyacı çıkar.
+- "Plajda giymek için kadın kombini" → plaj elbisesi/mayo, şort, sandalet, güneş gözlüğü, güneş kremi, hasır şapka
+- "Halısaha maçı için ne lazım" → krampon/halısaha ayakkabısı, forma, şort, konç, eldiven
+- "Ofise giderken şık görünmek istiyorum" → gömlek, kumaş pantolon, blazer ceket, klasik ayakkabı, kravat
+- "Kış geldi üşüyorum" → mont, kazak, bere, atkı, bot, termal içlik
+- HER ZAMAN SOMUT ÜRÜN TÜRLERİ belirle, soyut kavramlar yazma.
+
+ANAHTAR KELİME KURALLARI:
+- keywords dizisi: Ürünü bulmak için 2-3 FARKLI arama terimi ver. Spesifikten genele sırala.
+  Örn: güneş gözlüğü arıyorsan → ["güneş gözlüğü", "güneş gözlük", "gözlük"]
+  Örn: krampon arıyorsan → ["halısaha ayakkabı", "krampon", "futbol ayakkabı"]
+  Örn: plaj elbisesi arıyorsan → ["plaj elbise", "yazlık elbise", "elbise"]
+- İLK keyword en spesifik olmalı, sonuncusu en genel.
+- Tek kelimelik genel terimler YAZMA ("gözlük" değil "güneş gözlüğü", "ayakkabı" değil "spor ayakkabı").
+
+ALTERNATİF ÜRÜN KURALLARI:
+- alternatives dizisi: Eğer ana ürün mağazada yoksa yerine geçebilecek FARKLI ürün türlerini belirt.
+  Örn: güneş gözlüğü bulunamazsa → alternatives: ["şapka", "hasır şapka", "vizör"]
+  Örn: krampon bulunamazsa → alternatives: ["spor ayakkabı", "futbol çorabı"]
+  Örn: blazer ceket bulunamazsa → alternatives: ["hırka", "yelek", "trençkot"]
+- Alternatifler TAMAMEN FARKLI ürün türleri olmalı (aynı ürünün farklı yazılışları değil!).
+
+GÖRSEL ANALİZ KURALLARI:
+- Kullanıcı görsel gönderdiyse, görseldeki ürünleri tanımla (tür, renk, tarz, kategori).
+- Metin + görsel birleştirerek niyet belirle.
+- Sadece görsel varsa, görseldeki ürünlere benzer ürünler öner.
 
 HIKARI KATEGORİLERİ:
 Kadın > Giyim|Ayakkabı|Aksesuar & Çanta|Ev & İç Giyim
@@ -251,14 +349,14 @@ Kitap & Kırtasiye > Roman|Kalem|Defter|Çakmak Ürünleri
 Süpermarket > Gıda|Ev & Temizlik
 Ev & Yaşam > Ev Tekstili|Mutfak Gereçleri|Mobilya
 
-KURALLAR:
+GENEL KURALLAR:
 1. Her türlü ihtiyacı geniş düşün (spor, giyim, gıda, bakım, elektronik, kırtasiye...).
 2. Problem söylüyorsa (kokuyorum, acıktım, üşüdüm vb.) mağazadaki ürünle çöz.
 3. Mağazayla alakasız ise storeHasProducts:false, noStoreReason doldur.
-4. primary: en acil 1-2 ürün. secondary: tamamlayıcı 2-3 ürün.
-5. keyword: tek Türkçe kelime.
+4. primary: en acil 2-3 ürün türü. secondary: tamamlayıcı 2-4 ürün türü.
+5. Görsel varsa görselden çıkardığın bilgiyi intent ve keywords'e yansıt.
 SADECE JSON döndür:
-{"intent":"kısa niyet","storeHasProducts":true,"noStoreReason":"","primary":[{"mainCat":"","subCat":"","keyword":"","description":""}],"secondary":[{"mainCat":"","subCat":"","keyword":"","description":""}]}`;
+{"intent":"kısa niyet","storeHasProducts":true,"noStoreReason":"","primary":[{"mainCat":"","subCat":"","keywords":["spesifik terim","orta terim","genel terim"],"alternatives":["farklı ürün 1","farklı ürün 2"],"description":"bu ürün neden lazım"}],"secondary":[{"mainCat":"","subCat":"","keywords":["spesifik","genel"],"alternatives":["alternatif"],"description":""}]}`;
 
 function buildResponderPrompt(planData, primary, secondary) {
   const hasProds = primary.length > 0 || secondary.length > 0;
@@ -271,9 +369,19 @@ function buildResponderPrompt(planData, primary, secondary) {
     ? `\nÖNEMLİ: Bu ihtiyaç mağazamızda karşılanamaz. Kibarca açıkla: "${planData.noStoreReason || ''}". Ürün önerme.`
     : '';
 
-  return `Sen HIKARI mağazasının yardımsever tezgahtarısın. Her türlü ihtiyaç için — spor, giyim, kozmetik, gıda, elektronik, ev — samimi ve kısa yanıt verirsin. Robotik değil, içten konuş. Daima Türkçe. Yanıt yapısı:
-🎯 **Öncelikli İhtiyacın:** - (ana ürün)
-✨ **Bunlar da Lazım Olabilir:** - (yan ürünler)
+  return `Sen HIKARI mağazasının deneyimli tezgahtarısın. Mağazadaki her ürünü tanıyorsun. Kullanıcının ihtiyacını anlayıp, veritabanından gelen ürünleri DEĞERLENDİR ve sadece gerçekten uygun olanları öner.
+
+GÖREV:
+- Aşağıdaki ürün listesinden kullanıcının ihtiyacına EN UYGUN olanları seç ve öner.
+- Her ürün için NEDEN uygun olduğunu kısaca belirt (örn: "plajda rahat yürüyüş için ideal", "güneşten korunma sağlar").
+- Kullanıcının isteğiyle ALAKASIZ ürünleri görmezden gel, onları önerme.
+- Eğer bir ürün alternatif olarak (asıl istenen bulunamadığı için) geldiyse, bunu dürüstçe belirt.
+- Kullanıcı görsel gönderdiyse, görseldeki ürünle ilgili yorumunu da ekle.
+
+ÜSLUP: Samimi, kısa, içten. Robotik değil. Daima Türkçe.
+YAPI:
+🎯 **Öncelikli İhtiyacın:** - (ana ürünler ve neden uygun)
+✨ **Bunlar da Lazım Olabilir:** - (tamamlayıcı ürünler)
 ${prodCtx}${noStoreNote}`;
 }
 
@@ -283,8 +391,23 @@ export async function POST(req) {
     const { messages } = await req.json();
     const key1 = process.env.GEMINI_API_KEY;
     const key2 = process.env.GEMINI_API_KEY_2 || key1;
+    const key3 = process.env.GEMINI_API_KEY_3;
+    const allKeys = [key1, key2, key3].filter((k, i, a) => k && a.indexOf(k) === i); // unique keys
 
     if (!key1) return NextResponse.json({ error: 'GEMINI_API_KEY eksik.' }, { status: 500 });
+
+    // Server-side throttle — çok hızlı art arda istek engelle
+    const now = Date.now();
+    const timeSinceLast = now - lastRequestTime;
+    if (timeSinceLast < MIN_REQUEST_INTERVAL) {
+      const waitSec = Math.ceil((MIN_REQUEST_INTERVAL - timeSinceLast) / 1000);
+      return NextResponse.json({
+        text: `⏳ Lütfen ${waitSec} saniye bekleyin, ardından tekrar deneyin.`,
+        primaryProducts: [], secondaryProducts: [],
+        debug: [{ stage: '⏳ THROTTLE', detail: `${waitSec}s bekleme gerekli (son istek ${Math.floor(timeSinceLast/1000)}s önce)` }]
+      });
+    }
+    lastRequestTime = now;
 
     let contents = messages
       .filter(m => !m.isLoading)
@@ -298,18 +421,29 @@ export async function POST(req) {
     if (contents[0]?.role === 'model') contents.shift();
     if (!contents.length) return NextResponse.json({ text: 'Merhaba! Nasıl yardımcı olabilirim?', primaryProducts: [], secondaryProducts: [] });
 
-    const lastUserText = messages.filter(m => m.sender === 'user').pop()?.text || '';
+    const lastUserMsg = messages.filter(m => m.sender === 'user').pop();
+    const lastUserText = lastUserMsg?.text || '';
+    const lastUserImage = lastUserMsg?.image || null;
 
     // ── AŞAMA 1: PLANNER ────────────────────────────────────────────────────
     let planData  = null;
     let primary   = [];
     let secondary = [];
+    const debugLog = []; // Pipeline aşama paneli için
+
+    // Planner'a gönderilecek parts: metin + varsa görsel
+    const plannerParts = [];
+    if (lastUserImage) {
+      plannerParts.push({ inlineData: { mimeType: lastUserImage.mimeType, data: lastUserImage.base64Data } });
+      console.log('[Planner] Image detected, sending to vision analysis...');
+    }
+    plannerParts.push({ text: lastUserText || 'Bu görseldeki ürünlere benzer ürünler öner.' });
 
     const planResult = await callGemini({
-      apiKey: key1, models: PLANNER_MODELS, cooldowns: plannerCooldowns,
+      apiKeys: allKeys, models: PLANNER_MODELS, cooldowns: plannerCooldowns,
       getPreferred: () => preferredPlanner, setPreferred: m => { preferredPlanner = m; },
       body: {
-        contents: [{ role: 'user', parts: [{ text: lastUserText }] }],
+        contents: [{ role: 'user', parts: plannerParts }],
         systemInstruction: { parts: [{ text: PLANNER_PROMPT }] },
         generationConfig: {
           responseMimeType: 'application/json',
@@ -325,6 +459,7 @@ export async function POST(req) {
       try {
         planData = JSON.parse(planResult.text);
         console.log('[Planner] OK:', planData.intent, '| storeHas:', planData.storeHasProducts);
+        debugLog.push({ stage: '1. PLANNER', detail: `Intent: ${planData.intent}`, data: planData });
 
         if (planData.storeHasProducts !== false) {
           // ── AŞAMA 2a: DB ARAMASI ───────────────────────────────────────────
@@ -333,14 +468,29 @@ export async function POST(req) {
             searchProducts(planData.secondary || [], lastUserText)
           ]);
           console.log(`[DB] primary:${primary.length} secondary:${secondary.length}`);
+          debugLog.push({ stage: '2a. DB ARAMA', detail: `primary: ${primary.length}, secondary: ${secondary.length}`, primaryNames: primary.map(p=>p.productname), secondaryNames: secondary.map(p=>p.productname) });
 
-          // ── AŞAMA 2b: GÖRSEL DOĞRULAMA ─────────────────────────────────────
-          // key2 kullanılır (ayrı key varsa kota baskısı azalır)
-          [primary, secondary] = await Promise.all([
-            validateWithImages(primary,   lastUserText, key2),
-            validateWithImages(secondary, lastUserText, key2)
-          ]);
-          console.log(`[Validator] After: primary:${primary.length} secondary:${secondary.length}`);
+          // ── AŞAMA 2b: GÖRSEL DOĞRULAMA (opsiyonel — API kota baskısı varsa atla) ─────
+          // Son 30s içinde cooldown olan model sayısını kontrol et
+          const nowMs = Date.now();
+          const activeCooldowns = Object.entries(plannerCooldowns)
+            .filter(([, v]) => v > nowMs).length +
+            Object.entries(responderCooldowns)
+            .filter(([, v]) => v > nowMs).length;
+          
+          if (activeCooldowns < 2) {
+            // Kota güvenli — validator çalıştır
+            const validatorKey = allKeys[allKeys.length - 1]; // en az kullanılan key
+            [primary, secondary] = await Promise.all([
+              validateWithImages(primary,   lastUserText, validatorKey),
+              validateWithImages(secondary, lastUserText, validatorKey)
+            ]);
+            console.log(`[Validator] After: primary:${primary.length} secondary:${secondary.length}`);
+            debugLog.push({ stage: '2b. GÖRSEL DOĞRULAMA', detail: `primary: ${primary.length}, secondary: ${secondary.length}` });
+          } else {
+            console.log(`[Validator] ATILDI — ${activeCooldowns} aktif cooldown, kota korunuyor`);
+            debugLog.push({ stage: '2b. GÖRSEL DOĞRULAMA ⏭️', detail: `Atlandı (${activeCooldowns} cooldown aktif, kota Planner/Responder için korunuyor)` });
+          }
 
           // -- ASAMA 2c: CINSIYET / DEMOGRAFIK FILTRE ---
           const uq = lastUserText.toLowerCase();
@@ -369,6 +519,7 @@ export async function POST(req) {
           primary   = genderFilter(primary);
           secondary = genderFilter(secondary);
           console.log(`[GenderFilter] primary:${primary.length} secondary:${secondary.length}`);
+          debugLog.push({ stage: '2c. CİNSİYET FİLTRE', detail: `kadın:${wantsKadin} erkek:${wantsErkek} çocuk:${wantsCocuk} → primary: ${primary.length}, secondary: ${secondary.length}` });
 
           // -- ASAMA 2d: KOMBIN BUTUNLUGU ---
           const isKombin = uq.includes('kombin') || uq.includes('outfit');
@@ -403,14 +554,16 @@ export async function POST(req) {
     } else {
       // Planner başarısız → keyword fallback
       console.warn('[Planner] All models failed, running keyword fallback search...');
+      debugLog.push({ stage: '1. PLANNER ❌', detail: `Başarısız: ${planResult.error || 'Tüm modeller ve key\'ler denendi'}` });
       const fallback = await keywordFallbackSearch(lastUserText);
       primary   = fallback.primary;
       secondary = fallback.secondary;
+      debugLog.push({ stage: '1b. KEYWORD FALLBACK', detail: `primary: ${primary.length}, secondary: ${secondary.length}`, primaryNames: primary.map(p=>p.productname), secondaryNames: secondary.map(p=>p.productname) });
     }
 
     // ── AŞAMA 3: RESPONDER ───────────────────────────────────────────────────
     const respResult = await callGemini({
-      apiKey: key2, models: RESPONDER_MODELS, cooldowns: responderCooldowns,
+      apiKeys: allKeys, models: RESPONDER_MODELS, cooldowns: responderCooldowns,
       getPreferred: () => preferredResponder, setPreferred: m => { preferredResponder = m; },
       body: {
         contents,
@@ -427,8 +580,9 @@ export async function POST(req) {
     });
 
     const text = respResult.ok ? respResult.text : buildFallbackText(planData, primary, secondary);
+    debugLog.push({ stage: '3. RESPONDER', detail: respResult.ok ? 'Başarılı yanıt üretildi' : 'Fallback yanıt kullanıldı' });
 
-    return NextResponse.json({ text, primaryProducts: primary, secondaryProducts: secondary });
+    return NextResponse.json({ text, primaryProducts: primary, secondaryProducts: secondary, debug: debugLog });
 
   } catch (e) {
     console.error('[Hikai] Fatal:', e);

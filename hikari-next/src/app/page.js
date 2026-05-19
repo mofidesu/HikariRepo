@@ -212,28 +212,28 @@ export default function Home() {
                     <br />
                     <h2 className="font-headline-lg text-headline-lg text-on-surface mb-6">Kategoriye Göre Alışveriş Yap</h2>
                     <div className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide snap-x">
-                        <Link className="flex flex-col items-center gap-3 min-w-[100px] snap-center group" href="/collection?category=Tshirts">
+                        <Link className="flex flex-col items-center gap-3 min-w-[100px] snap-center group" href="/collection?q=Tişört">
                             <div className="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow relative">
                                 <img alt="T-Shirts" className="absolute inset-0 w-full h-full object-cover"
                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQk9-UqrpgObl8ujrXMk-wpFz8SVjKQkcV1j64IWjFa2XLzWbkTXJ4qNLDvw64B8cpDk821s8AtbbF9Y6Yyt7eI-0qdFvFQyQ_kfPnfR0U75Sov48CVzsKOhPu4VzqAF0380DPizeojhMSmxtBBsOvvECYcdLCA8T0d8CgUpi7nXnHfRrXwluGLwkSQsKZfD1KEad55sKFMJopxkCBiTvkWpf1IHO-g-6oRAn0K9vTvF2qZIolBXs2zCHmB-Asy4rzx9vMHmVp86U" />
                             </div>
                             <span className="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors text-center">T-Shirt</span>
                         </Link>
-                        <Link className="flex flex-col items-center gap-3 min-w-[100px] snap-center group" href="/collection?category=Jackets">
+                        <Link className="flex flex-col items-center gap-3 min-w-[100px] snap-center group" href="/collection?q=Ceket">
                             <div className="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow relative">
                                 <img alt="Jackets" className="absolute inset-0 w-full h-full object-cover"
                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuBW8qoDqRaP5zBgZfFALV3brwfSoGIXcpvKMwjrnbVORXMzfc5ME6Ffw4ZrYiQtNV4ENhelffq5KpJwX4_JTZmQks7NgSO8YCRiZJJU86n5s1jJKrWlXDdK7ikIVuCRHuaNHUbHSAZ4JXuYc6JDWclKWSIpzGXwIFeF7VWS75Buv_SenrC8b0ThM0C9cB5EX1kcFEj-bf0goU2Jkx_HHg3QWu6qUYY4xrVM7qHCY5oKCinU0cYDgSvroKe_1u2GE0BE8m01AzkQ3MM" />
                             </div>
                             <span className="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors text-center">Ceketler</span>
                         </Link>
-                        <Link className="flex flex-col items-center gap-3 min-w-[100px] snap-center group" href="/collection?category=Sports Shoes">
+                        <Link className="flex flex-col items-center gap-3 min-w-[100px] snap-center group" href="/collection?q=Spor Ayakkabı">
                             <div className="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow relative">
                                 <img alt="Sneakers" className="absolute inset-0 w-full h-full object-cover"
                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKdWlLiEJY-v__f4oHKXNo-gY0cop7asa6dUzg4O1zcmZezrWsK-Vbqoa20g7FI-3Uo-ekcXuspA3dFYuQf4AM1bWmessNpP2JfDP0llS65YClt0a17wZmKob2GzGtocTzZjMOEFejG3Cr8Aubolh2KtoLfiZfAtwaWFYJ7dKk_ks2ONLlMXu67_-C_FdAqTSqPkVaKnIVaRLgnG_-yt9G_rMjRV9oZhy3lYUL4sXEpsBUwHmk66f8YSnek0oSqia1p0_M4aTMocY" />
                             </div>
                             <span className="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors text-center">Spor Ayakkabılar</span>
                         </Link>
-                        <Link className="flex flex-col items-center gap-3 min-w-[100px] snap-center group" href="/collection?category=Accessories">
+                        <Link className="flex flex-col items-center gap-3 min-w-[100px] snap-center group" href="/collection?q=Aksesuar">
                             <div className="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow relative">
                                 <img alt="Accessories" className="absolute inset-0 w-full h-full object-cover"
                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPp_pzChKqq5bgR40l6qKyOVgSAaSJT3nynxJ3gwGqvQyb2cHF9ndyLKGvCoQ6y2MDBQqSE9fqHDBwdtaYxIHeno1_JF36ZEUWbUxrSE-z3DGyBP7NLhlufUzwETVK0Q09c2azdV03amexPUuRM4Mqc0z7PBxWhtzz4eRbnVBxMVlak3C0IZrbpB-_5R59ZbKl3WYwyuwH8VBMGmpzgd8TjUJmigSXB__2TU167Jbf1251uVW_WPDkqaGTMonJnWbw1D0SfLtDOwc" />

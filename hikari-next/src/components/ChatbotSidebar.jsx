@@ -1,25 +1,152 @@
-﻿'use client';
+'use client';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
-export default function ChatbotSidebar({ isOpen, onClose }) {
-    // 1. Sohbet kalıcılığı: Mesaj geçmişini sessionStorage'dan yüklüyoruz.
-    const [messages, setMessages] = useState(() => {
-        if (typeof window !== 'undefined') {
-            const saved = sessionStorage.getItem('hikai_messages');
-            if (saved) return JSON.parse(saved);
+// ── Pipeline Debug Paneli ────────────────────────────────────────────────────
+function DebugPanel({ debug }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [expandedStage, setExpandedStage] = useState(null);
+
+    if (!debug || !debug.length) return null;
+
+    const plannerStage = debug.find(d => d.stage?.includes('PLANNER'));
+    const planData = plannerStage?.data;
+
+    const stageIcons = {
+        'PLANNER': '🧠',
+        'DB ARAMA': '🔍',
+        'GÖRSEL': '🖼️',
+        'CİNSİYET': '👤',
+        'RESPONDER': '💬'
+    };
+
+    const getIcon = (stage) => {
+        for (const [key, icon] of Object.entries(stageIcons)) {
+            if (stage.includes(key)) return icon;
         }
-        return [
-            { id: 1, text: "Merhaba! Ben Hikai. Sana özel stil önerileri sunmak, hediye seçmek veya koleksiyonlarımız hakkında bilgi vermek için buradayım.", sender: "bot" }
-        ];
-    });
+        return '⚙️';
+    };
+
+    return (
+        <div className="ml-10 mr-2">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-high/80 border border-outline-variant/30 text-[10px] font-bold text-secondary hover:text-primary hover:border-primary/40 transition-all duration-200 backdrop-blur-sm"
+            >
+                <span className="text-[14px]">🔬</span>
+                <span>Pipeline Debug</span>
+                <span className={`material-symbols-outlined text-[14px] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>expand_more</span>
+            </button>
+
+            {isOpen && (
+                <div className="mt-2 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl p-3 text-[11px] font-mono space-y-2 shadow-xl overflow-x-auto max-h-[400px] overflow-y-auto scrollbar-hide">
+                    {/* Planner Özeti */}
+                    {planData && (
+                        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-2.5 space-y-1.5">
+                            <div className="flex items-center gap-1.5 text-blue-400 font-bold text-[11px]">
+                                <span>🧠</span>
+                                <span>PLANNER ÇIKTISI</span>
+                            </div>
+                            <div className="text-gray-300">
+                                <span className="text-blue-300">intent:</span> <span className="text-green-400">&quot;{planData.intent}&quot;</span>
+                            </div>
+
+                            {/* Primary Items */}
+                            {planData.primary?.map((item, i) => (
+                                <div key={`p-${i}`} className="bg-gray-800/50 rounded-md p-2 mt-1 border border-gray-700/30">
+                                    <div className="text-amber-400 font-bold mb-1">🎯 Primary [{i}]</div>
+                                    <div className="text-gray-300 space-y-0.5">
+                                        <div><span className="text-gray-500">keywords:</span> <span className="text-green-400">[{(item.keywords || [item.keyword]).filter(Boolean).map(k => `"${k}"`).join(', ')}]</span></div>
+                                        {item.alternatives?.length > 0 && (
+                                            <div><span className="text-gray-500">alternatives:</span> <span className="text-yellow-400">[{item.alternatives.map(a => `"${a}"`).join(', ')}]</span></div>
+                                        )}
+                                        <div><span className="text-gray-500">mainCat:</span> <span className="text-purple-400">{item.mainCat || '-'}</span> <span className="text-gray-500">subCat:</span> <span className="text-purple-400">{item.subCat || '-'}</span></div>
+                                        {item.description && <div><span className="text-gray-500">desc:</span> <span className="text-gray-400">{item.description}</span></div>}
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Secondary Items */}
+                            {planData.secondary?.map((item, i) => (
+                                <div key={`s-${i}`} className="bg-gray-800/50 rounded-md p-2 mt-1 border border-gray-700/30">
+                                    <div className="text-cyan-400 font-bold mb-1">✨ Secondary [{i}]</div>
+                                    <div className="text-gray-300 space-y-0.5">
+                                        <div><span className="text-gray-500">keywords:</span> <span className="text-green-400">[{(item.keywords || [item.keyword]).filter(Boolean).map(k => `"${k}"`).join(', ')}]</span></div>
+                                        {item.alternatives?.length > 0 && (
+                                            <div><span className="text-gray-500">alternatives:</span> <span className="text-yellow-400">[{item.alternatives.map(a => `"${a}"`).join(', ')}]</span></div>
+                                        )}
+                                        <div><span className="text-gray-500">mainCat:</span> <span className="text-purple-400">{item.mainCat || '-'}</span></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Pipeline Aşamaları */}
+                    {debug.map((step, i) => (
+                        <div key={i} className="flex items-start gap-2">
+                            <span className="text-[13px] mt-0.5 shrink-0">{getIcon(step.stage)}</span>
+                            <div className="flex-1 min-w-0">
+                                <button
+                                    onClick={() => setExpandedStage(expandedStage === i ? null : i)}
+                                    className="w-full text-left"
+                                >
+                                    <span className="text-emerald-400 font-bold">{step.stage}</span>
+                                    <span className="text-gray-400 ml-2">{step.detail}</span>
+                                    {(step.primaryNames || step.data) && (
+                                        <span className={`material-symbols-outlined text-[12px] text-gray-500 ml-1 inline-block transition-transform ${expandedStage === i ? 'rotate-180' : ''}`}>expand_more</span>
+                                    )}
+                                </button>
+                                {expandedStage === i && step.primaryNames && (
+                                    <div className="mt-1 pl-2 border-l border-gray-700 text-gray-400 space-y-0.5">
+                                        <div className="text-amber-400">Primary ürünler:</div>
+                                        {step.primaryNames.map((n, j) => <div key={j} className="text-gray-300 truncate">• {n}</div>)}
+                                        {step.secondaryNames?.length > 0 && (
+                                            <>
+                                                <div className="text-cyan-400 mt-1">Secondary ürünler:</div>
+                                                {step.secondaryNames.map((n, j) => <div key={j} className="text-gray-300 truncate">• {n}</div>)}
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+export default function ChatbotSidebar({ isOpen, onClose }) {
+    // 1. Sohbet kalıcılığı: Başlangıçta sabit default — hydration uyumu için.
+    const defaultMessages = [
+        { id: 1, text: "Merhaba! Ben Hikai. Sana özel stil önerileri sunmak, hediye seçmek veya koleksiyonlarımız hakkında bilgi vermek için buradayım.", sender: "bot" }
+    ];
+    const [messages, setMessages] = useState(defaultMessages);
+    const [hydrated, setHydrated] = useState(false);
+
+    // sessionStorage'dan yükleme — sadece client mount sonrası
+    useEffect(() => {
+        try {
+            const saved = sessionStorage.getItem('hikai_messages');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length) setMessages(parsed);
+            }
+        } catch {}
+        setHydrated(true);
+    }, []);
     
     const [inputValue, setInputValue] = useState("");
     const [selectedImage, setSelectedImage] = useState(null); // { base64Data, mimeType, previewUrl }
     const [isDragging, setIsDragging] = useState(false);
+    const [isCooldown, setIsCooldown] = useState(false);
+    const [cooldownSec, setCooldownSec] = useState(0);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
+    const cooldownRef = useRef(null);
 
     // 2. Sağ tarafta açılacak premium Ürün Çekmecesi (ProductDrawer) durumları
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -28,9 +155,27 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
     const [drawerSecondaryProducts, setDrawerSecondaryProducts] = useState([]);
 
     // 3. Sohbet geçmişini her değiştiğinde sessionStorage'a kaydediyoruz.
+    // Base64 görsel verisi ve debug bilgisi çıkarılır (sessionStorage 5MB limiti).
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            sessionStorage.setItem('hikai_messages', JSON.stringify(messages));
+            try {
+                const lightweight = messages.map(m => {
+                    const clean = { ...m };
+                    // Görsel base64 verisini kaldır (çok büyük), sadece previewUrl ve flag kalsın
+                    if (clean.image) {
+                        clean.image = { mimeType: clean.image.mimeType, hadImage: true };
+                    }
+                    // Debug verisini kaldır (geçici panel zaten)
+                    delete clean.debug;
+                    // Ürün listelerini kaldır (drawer zaten re-fetch eder)
+                    delete clean.primaryProducts;
+                    delete clean.secondaryProducts;
+                    return clean;
+                });
+                sessionStorage.setItem('hikai_messages', JSON.stringify(lightweight));
+            } catch (e) {
+                console.warn('[SessionStorage] Kayıt başarısız:', e.message);
+            }
         }
     }, [messages]);
 
@@ -158,7 +303,8 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
                 text: cleanText,
                 sender: "bot",
                 primaryProducts: primaryProds,
-                secondaryProducts: secondaryProds
+                secondaryProducts: secondaryProds,
+                debug: data.debug || null
             };
 
             setMessages(prev =>
@@ -179,9 +325,29 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
         }
     };
 
+    // Cooldown başlat (8 saniye)
+    const startCooldown = () => {
+        const COOLDOWN = 8;
+        setIsCooldown(true);
+        setCooldownSec(COOLDOWN);
+        if (cooldownRef.current) clearInterval(cooldownRef.current);
+        cooldownRef.current = setInterval(() => {
+            setCooldownSec(prev => {
+                if (prev <= 1) {
+                    clearInterval(cooldownRef.current);
+                    setIsCooldown(false);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+    };
+
     const handleSend = (e) => {
         e.preventDefault();
         if (!inputValue.trim() && !selectedImage) return;
+        if (isCooldown) return;
+        startCooldown();
         sendMessage(inputValue);
     };
 
@@ -333,6 +499,10 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
                         const hasProducts = (msg.primaryProducts && msg.primaryProducts.length > 0) || (msg.secondaryProducts && msg.secondaryProducts.length > 0);
                         return (
                             <div key={msg.id} className="space-y-4">
+                                {/* Pipeline Debug Paneli */}
+                                {msg.sender === 'bot' && !msg.isLoading && msg.debug && (
+                                    <DebugPanel debug={msg.debug} />
+                                )}
                                 <div className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} opacity-100 transition-opacity duration-300`}>
                                     {msg.sender === 'bot' && (
                                         <div className="w-8 h-8 rounded-full bg-white border border-outline-variant/30 flex items-center justify-center mr-2.5 flex-shrink-0 mt-1 shadow-sm overflow-hidden p-1">
@@ -468,13 +638,20 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
                         />
                         <button
                             type="submit"
-                            disabled={!inputValue.trim() && !selectedImage}
-                            className={`absolute right-2.5 top-1/2 transform -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 ${(inputValue.trim() || selectedImage)
-                                    ? 'bg-primary text-white shadow-md hover:shadow-lg hover:scale-105'
-                                    : 'bg-surface-container-highest text-secondary'
+                            disabled={(!inputValue.trim() && !selectedImage) || isCooldown}
+                            className={`absolute right-2.5 top-1/2 transform -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 ${isCooldown
+                                    ? 'bg-amber-500/80 text-white cursor-not-allowed'
+                                    : (inputValue.trim() || selectedImage)
+                                        ? 'bg-primary text-white shadow-md hover:shadow-lg hover:scale-105'
+                                        : 'bg-surface-container-highest text-secondary'
                                 }`}
+                            title={isCooldown ? `${cooldownSec}s bekleyin` : 'Gönder'}
                         >
-                            <span className="material-symbols-outlined text-[18px] ml-0.5">send</span>
+                            {isCooldown ? (
+                                <span className="text-[12px] font-bold">{cooldownSec}s</span>
+                            ) : (
+                                <span className="material-symbols-outlined text-[18px] ml-0.5">send</span>
+                            )}
                         </button>
                     </form>
                     <p className="text-center text-[9px] text-secondary mt-3.5 font-medium">Hikai yanlışlıklar yapabilir. Lütfen önemli bilgileri doğrulayın.</p>
