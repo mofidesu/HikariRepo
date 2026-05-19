@@ -363,6 +363,85 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
         setIsDrawerOpen(true);
     };
 
+    // ── Vitrin Kaydetme Sistemi ──────────────────────────────────────────────
+    const [savedVitrinIds, setSavedVitrinIds] = useState(() => {
+        // Daha önce kaydedilmiş vitrin mesaj ID'lerini yükle
+        if (typeof window !== 'undefined') {
+            try {
+                const ud = JSON.parse(sessionStorage.getItem('userData')) || {};
+                return (ud.saved_vitrins || []).map(v => v.msgId);
+            } catch { return []; }
+        }
+        return [];
+    });
+
+    const isVitrinSaved = (msgId) => savedVitrinIds.includes(msgId);
+
+    const handleSaveVitrin = (msg) => {
+        // 1. Auth kontrolü — favorites ile aynı pattern
+        if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+            alert('Vitrini kaydetmek için lütfen giriş yapın.');
+            window.location.href = '/login';
+            return;
+        }
+
+        const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
+        if (!userData.saved_vitrins) userData.saved_vitrins = [];
+
+        // 2. Toggle: zaten kaydedilmişse kaldır
+        const existingIdx = userData.saved_vitrins.findIndex(v => v.msgId === msg.id);
+        if (existingIdx !== -1) {
+            userData.saved_vitrins.splice(existingIdx, 1);
+            sessionStorage.setItem('userData', JSON.stringify(userData));
+            setSavedVitrinIds(userData.saved_vitrins.map(v => v.msgId));
+
+            // Supabase sync
+            if (userData.id) {
+                supabase.from('profiles')
+                    .update({ saved_vitrins: userData.saved_vitrins })
+                    .eq('id', userData.id)
+                    .then(({ error }) => { if (error) console.error('[Vitrin] Supabase remove error:', error); });
+            }
+            return;
+        }
+
+        // 3. Yeni vitrin kaydet
+        // Kullanıcının bu yanıttan önceki son mesajını bul (sorgu metni olarak)
+        const msgIndex = messages.findIndex(m => m.id === msg.id);
+        let queryText = '';
+        for (let i = msgIndex - 1; i >= 0; i--) {
+            if (messages[i].sender === 'user') {
+                queryText = messages[i].text || '';
+                break;
+            }
+        }
+
+        const allProducts = [...(msg.primaryProducts || []), ...(msg.secondaryProducts || [])];
+        const vitrinEntry = {
+            msgId: msg.id,
+            query: queryText,
+            productIds: allProducts.map(p => p.id),
+            productNames: allProducts.slice(0, 5).map(p => p.productname),
+            productImages: allProducts.slice(0, 4).map(p => p.imgUrl),
+            totalProducts: allProducts.length,
+            savedAt: new Date().toISOString()
+        };
+
+        userData.saved_vitrins.push(vitrinEntry);
+        sessionStorage.setItem('userData', JSON.stringify(userData));
+        setSavedVitrinIds(userData.saved_vitrins.map(v => v.msgId));
+
+        // 4. Supabase sync
+        if (userData.id) {
+            supabase.from('profiles')
+                .update({ saved_vitrins: userData.saved_vitrins })
+                .eq('id', userData.id)
+                .then(({ error }) => { if (error) console.error('[Vitrin] Supabase save error:', error); });
+        }
+
+        window.dispatchEvent(new Event('storage'));
+    };
+
     return (
         <>
             {/* Animasyonlu CSS Stil Blokları */}
@@ -565,7 +644,7 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
                                                 </div>
                                             </div>
                                             
-                                            {/* Mini Görsel Önizlemeleri */}
+                                            {/* Mini Görsel Önizlemeleri + Butonlar */}
                                             <div className="flex items-center gap-1.5">
                                                 <div className="flex -space-x-2.5 overflow-hidden">
                                                     {[...(msg.primaryProducts || []), ...(msg.secondaryProducts || [])].slice(0, 3).map((prod, idx) => (
@@ -574,6 +653,18 @@ export default function ChatbotSidebar({ isOpen, onClose }) {
                                                         </div>
                                                     ))}
                                                 </div>
+                                                {/* Vitrini Kaydet Butonu */}
+                                                <button
+                                                    onClick={() => handleSaveVitrin(msg)}
+                                                    title={isVitrinSaved(msg.id) ? 'Vitrin kaydedildi' : 'Vitrini Kaydet'}
+                                                    className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all active:scale-90 duration-200 shrink-0 ${
+                                                        isVitrinSaved(msg.id)
+                                                            ? 'bg-amber-500/15 text-amber-600 border border-amber-500/30'
+                                                            : 'bg-surface-container-highest/60 text-secondary hover:text-primary hover:bg-primary/10 border border-outline-variant/30'
+                                                    }`}
+                                                >
+                                                    <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: isVitrinSaved(msg.id) ? "'FILL' 1" : "'FILL' 0" }}>bookmark</span>
+                                                </button>
                                                 <button
                                                     onClick={() => handleOpenShowcase(msg.primaryProducts, msg.secondaryProducts)}
                                                     className="px-3.5 py-1.5 bg-primary hover:bg-[#8a3100] text-white text-[11px] font-bold rounded-xl shadow-sm transition-all active:scale-95 duration-200 shrink-0"

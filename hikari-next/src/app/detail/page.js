@@ -63,19 +63,44 @@ function DetailContent() {
                         setIsFav(userData.favorites && userData.favorites.includes(productId));
                     }
 
-                    // Review count (mocking it for now)
-                    setReviewCount(Math.floor(Math.random() * 200) + 10);
+                    // Review count — veritabanındaki gerçek değeri kullan
+                    setReviewCount(foundProduct.reviews || 0);
 
-                    // Similar products
-                    const { data: similar } = await supabase
-                        .from('products')
-                        .select('*')
-                        .neq('id', productId)
-                        .limit(8);
+                    // Similar products — aynı kategoriden getir
+                    let similar = [];
                     
-                    if (similar) {
-                        setSimilarProducts([...similar].sort(() => 0.5 - Math.random()));
+                    // Önce sub_category'den dene
+                    if (foundProduct.sub_category) {
+                        const { data: subCatProducts } = await supabase
+                            .from('products')
+                            .select('*')
+                            .eq('sub_category', foundProduct.sub_category)
+                            .neq('id', productId)
+                            .limit(12);
+                        if (subCatProducts && subCatProducts.length > 0) similar = subCatProducts;
                     }
+                    
+                    // Yetersizse main_category'den tamamla
+                    if (similar.length < 4 && foundProduct.main_category) {
+                        const existingIds = new Set(similar.map(p => p.id));
+                        const { data: mainCatProducts } = await supabase
+                            .from('products')
+                            .select('*')
+                            .eq('main_category', foundProduct.main_category)
+                            .neq('id', productId)
+                            .limit(12);
+                        if (mainCatProducts) {
+                            for (const p of mainCatProducts) {
+                                if (!existingIds.has(p.id)) {
+                                    similar.push(p);
+                                    existingIds.add(p.id);
+                                }
+                                if (similar.length >= 12) break;
+                            }
+                        }
+                    }
+                    
+                    setSimilarProducts([...similar].sort(() => 0.5 - Math.random()));
                 }
             };
             fetchProduct();
@@ -316,7 +341,7 @@ function DetailContent() {
                         </button>
                     </div>
                 </div>
-                <div ref={sliderRef} className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar pb-8">
+                <div ref={sliderRef} className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth scrollbar-hide pb-4">
                     {similarProducts.map(p => (
                         <ProductCard key={`sim-${p.id}`} product={p} />
                     ))}

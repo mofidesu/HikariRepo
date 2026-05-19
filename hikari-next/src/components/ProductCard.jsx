@@ -34,6 +34,7 @@ export default function ProductCard({ product, isGrid = false }) {
     const reviews = product.reviews || 0;
     const price = formatPrice(product.price);
     const categoryName = product.sub_category || product.main_category || 'Kategori';
+    const socialProof = product.social_proof || '';
 
     // Bileşen yüklendiğinde kullanıcının oturum verisini tarayıp bu ürünün favorilerde olup olmadığını kontrol eder.
     useEffect(() => {
@@ -144,13 +145,22 @@ export default function ProductCard({ product, isGrid = false }) {
 
     return (
         <div onClick={() => router.push(`/detail?id=${encodeURIComponent(product.id)}`)}
-            className={`bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer flex flex-col h-full ${cardWidthClass}`}>
+            className={`bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer flex flex-col h-full scale-[0.9] origin-top ${cardWidthClass}`}>
             
-            {/* Ürün Görseli ve Favori Kalp Butonu */}
+            {/* Ürün Görseli, Social Proof Badge ve Favori Kalp Butonu */}
             <div className="relative aspect-[4/5] bg-surface-container-low overflow-hidden">
                 <img alt={product.productname}
                     className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500 bg-white"
                     src={product.imgUrl || 'https://via.placeholder.com/300'} />
+                {/* Social Proof Badge — Sol Üst */}
+                {socialProof && (
+                    <div className="absolute top-2.5 left-2.5 max-w-[75%] z-10">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-md shadow-sm leading-tight border border-amber-300/50" style={{ background: 'linear-gradient(135deg, #FFE993, #F5D76E)', color: '#5C4813' }}>
+                            <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1", color: '#8B6914' }}>local_fire_department</span>
+                            {socialProof}
+                        </span>
+                    </div>
+                )}
                 <button aria-label="Add to Favorites"
                     className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full transition-colors shadow-sm cursor-pointer"
                     onClick={handleToggleFavorite}>

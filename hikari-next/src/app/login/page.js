@@ -51,7 +51,8 @@ export default function Login() {
             lastName: profile?.last_name || '',
             email: data.user.email,
             cart: profile?.cart || [],
-            favorites: profile?.favorites || []
+            favorites: profile?.favorites || [],
+            saved_vitrins: profile?.saved_vitrins || []
         };
 
         sessionStorage.setItem('isLoggedIn', 'true');
